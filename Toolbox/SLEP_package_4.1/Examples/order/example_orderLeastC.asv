@@ -1,0 +1,69 @@
+clear, clc;
+
+% This is an example for running the function LeastC
+% 
+%  min  1/2 || A x - y||^2 + lambda * \|x\|
+%  s.t. x satisfy the ordered tree structure (non-negative max-heap)
+%
+% For detailed description of the function, please refer to the Manual.
+%
+%% Related papers
+%
+% [1]  Jun Liu, Liang Sun, and Jieping Ye, Projection onto A Nonnegative
+%      Max-Heap, NIPS 2011.
+%
+%% Note:
+% In this example, the tree is given by the inpu
+
+cd ..
+cd ..
+
+root=cd;
+addpath(genpath([root '/SLEP']));
+                     % add the functions in the folder SLEP to the path
+                   
+% change to the original folder
+cd Examples/order;
+
+m=10;  n=18;    % The data matrix is of size m x n
+
+% for reproducibility
+randNum=1;
+
+% ---------------------- generate random data ----------------------
+randn('state',(randNum-1)*3+1);
+A=randn(m,n);       % the data matrix
+
+randn('state',(randNum-1)*3+2);
+xOrin=randn(n,1);
+
+randn('state',(randNum-1)*3+3);
+noise=randn(m,1);
+y=A*xOrin +...
+    noise*0.01;     % the response
+
+
+%----------------------- Set optional items -----------------------
+opts=[];
+
+% Starting point
+opts.init=2;            % starting from a zero point
+
+% Termination criterion
+opts.tFlag=5;          % run .maxIter iterations
+opts.maxIter=100;      % maximum number of iterations
+
+% Mormalization
+opts.nFlag=0;         % without normalization
+
+% The ordered tree is given by the file 
+opts.FileName='treeNodes.txt';
+opts.treeFlag=4; % 1: a sequential list
+                 % 2: full binary tree, n=2^d -1
+                 % 3: tree with depth 1
+                 % 4: a general tree, where the tree is specified by
+                 % opts.FileName
+opts.rootNum=18;
+
+[x1, funVal1, ValueL1]= orderLeastC(A, y, z, opts);
+
