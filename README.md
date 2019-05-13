@@ -1,22 +1,4 @@
 # BrainNetClass
-The aim of this toolbox is to make it easier for neuroscientists and clinicians to conduct state-of-the-art brain network 
-construction and rigorous machine learning-based classifications.
-  
-## Requirements
-  
-  * SLEP
-  * Libsvm
- 
- These two toolboxes are included in the repository but may need to be complied in your own computer.
- 
- ## Example Dataset
-  
-The repository provides a usage example on the eyes closed/eyes open dataset. 
-The goal is to use resting-state fMRI time series from 116 brain regions to construct brain functional networks 
-and predict whether the subject is in eyes closed state or eyes open state. 
-There is a full version (with longer running time but better classification result) and 
-a simplified version of the data (with shorter running time, for fast running).
-
 
 We are glad to announce that our new brain network construction & classification toolbox, BrainNetClass v1.0, has been released on Github (https://github.com/zzstefan/BrainNetClass). It is a Matlab-based, open-coded, user-friendly brain functional connectivity network-based disease classification toolbox that automatically conducts functional network construction, network feature extraction and selection, parameter optimization, classification, and result demonstration. It was designed to help neuroscientists, doctors, or researchers in other fields easily and correctly work on brain functional connectome with state-of-the-art algorithms and conduct rigorous individualized disease classification or other machine learning tasks. It is hoped that this toolbox could be of help in standardization the methodology and boost reproducibility, generalizability, and interpretability of the results. 
 
