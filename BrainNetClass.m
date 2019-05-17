@@ -25,7 +25,7 @@ function varargout = BrainNetClass(varargin)
 % Last Modified by GUIDE v2.5 07-Feb-2019 16:52:00
 
 % Begin initialization code - DO NOT EDIT
-% testcodefdfds
+
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
