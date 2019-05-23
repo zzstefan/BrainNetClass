@@ -401,8 +401,8 @@ label_positive=find(label==1);
 BrainNet_negative_mean=mean(opt_BrainNet(:,:,label_negative),3);
 BrainNet_positive_mean=mean(opt_BrainNet(:,:,label_positive),3);
 
-figure;
-%figure('visible','off');
+%figure;
+figure('visible','off');
 subplot(1,2,1);
 imagesc(BrainNet_positive_mean);
 colormap jet

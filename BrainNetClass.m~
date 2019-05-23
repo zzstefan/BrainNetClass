@@ -489,7 +489,7 @@ sign_FS=isfield(handles,'pop_choice_fs');
 switch handles.meth_Type
     case 'Network Type I:  No Parameter Required'
         sign_all_char={'input data','output directory','label','feature extraction method','feature selection method'};
-        sign_all_char=string(sign_all_char);
+        
         sign_all=[sign_input,sign_output,sign_label,sign_FEX,sign_FS];
         if sum(sign_all)<5
             index=find(sign_all==0);
@@ -507,8 +507,7 @@ switch handles.meth_Type
             error(temp);
         end
     case 'Network Type II: Parameter Required'
-        sign_all_char={'input data','output directory','label','parameter sensitivity test'};
-        sign_all_char=string(sign_all_char);
+        sign_all_char=["input data","output directory","label","parameter sensitivity test"];
         sign_all=[sign_input,sign_output,sign_label,handles.sensitivity_test.Value];
         if sum(sign_all)<4
             index=find(sign_all==0);
