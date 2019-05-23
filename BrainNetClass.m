@@ -238,7 +238,8 @@ elseif strcmpi(meth_Type,'Network Type II: Parameter Required')
     meth_Net='SR';
     handles.meth_Net=meth_Net;
     set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('\x3bb controlling sparsity'));
-    set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Connection coefficients as features \nt-test (p<0.05) + LASSO for feature selection'));
+    set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Connection coefficients as features'));
+    set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('t-test (p<0.05) + LASSO for feature selection'));
     %guidata(hObject,handles);
     if isfield(handles,'meth_Net')
         switch meth_Net
