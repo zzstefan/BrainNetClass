@@ -12,7 +12,7 @@
 % Modified by Han Zhang, 8/2/2017 hanzhang@med.unc.edu
 % IDEA lab, https://www.med.unc.edu/bric/ideagroup
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
-function [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc]=kfold_param_select(k_fold,result_dir,meth_Net,BOLD,label,para_test_flag,varargin)
+function [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,varargout]=kfold_param_select(k_fold,result_dir,meth_Net,BOLD,label,para_test_flag,varargin)
 switch meth_Net
     case {'SR','WSR','GSR'}
         lambda_1=varargin{1};
@@ -124,7 +124,7 @@ switch meth_Net
         num_W=length(W);
         parfor i=1:num_W % number of clusters
             for j=1:num_C
-                BrainNet{i,j}=dHOFC(BOLD,W(i),s,C(j));
+                [BrainNet{i,j},IDX{i,j}]=dHOFC(BOLD,W(i),s,C(j));
             end
         end
         BrainNet=reshape(BrainNet,1,num_W*num_C);
@@ -177,7 +177,12 @@ kfoldout=10;
 
 rng('shuffle');
 for i=1:fold_times
-    [opt_t(i,:),AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i}]=cal_kfold_times(nSubj,kfoldout,All_Feat,meth_Net,label,lambda_lasso);
+    switch meth_Net
+        case {'SR','WSR','GSR','SLR','SGR','WSGR','SSGSR'}
+            [opt_t(i,:),AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),feature_index_ttest(i,:),feature_index_lasso(i,:)]=cal_kfold_times(nSubj,kfoldout,All_Feat,meth_Net,label,lambda_lasso);
+        case 'dHOFC'
+            [opt_t(i,:),AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),feature_index_lasso(i,:)]=cal_kfold_times(nSubj,kfoldout,All_Feat,meth_Net,label,lambda_lasso);
+    end
     fprintf(1,'Begin fold %d...\n',i);
 end
 rng('default');
@@ -187,6 +192,17 @@ SPE=mean(SPE);
 F1=mean(F1);
 Acc=mean(Acc);
 ROC_kfold(plot_ROC,result_dir,fold_times);
+
+
+switch meth_Net
+    case {'SR','WSR','GSR','SLR','SGR','WSGR','SSGSR'}
+        varargout{1}=feature_index_ttest;
+        varargout{2}=feature_index_lasso;
+    case {'dHOFC'}
+        varargout{1}=feature_index_lasso;
+        varargout{2}=IDX;
+end
+
 
 if para_test_flag==1
     fprintf('Begin parameter sensitivity test\n');
@@ -278,7 +294,36 @@ if para_test_flag==1
       fprintf('End parameter sensitivity test\n');
 end
 
-function [opt_t,AUC,SEN,SPE,F1,Acc,plot_ROC]=cal_kfold_times(nSubj,kfoldout,All_Feat,meth_Net,label,lambda_lasso)
+
+[~,B]=max(Acc_para);
+opt_BrainNet=BrainNet{B(1)};
+label_negative=find(label==-1);
+label_positive=find(label==1);
+BrainNet_negative_mean=mean(opt_BrainNet(:,:,label_negative),3);
+BrainNet_positive_mean=mean(opt_BrainNet(:,:,label_positive),3);
+
+figure('visible','off');
+subplot(1,2,1);
+imagesc(BrainNet_positive_mean);
+colormap jet
+colorbar
+axis square
+xlabel('ROI');
+ylabel('ROI');
+title('label = -1')
+
+subplot(1,2,2);
+imagesc(BrainNet_negative_mean);
+colormap jet
+colorbar
+axis square
+xlabel('ROI');
+ylabel('ROI');
+title('label = 1')
+print(gcf,'-dtiffn',char(strcat(result_dir,'/Mean_optimal_network.tiff')));  
+
+
+function [opt_t,AUC,SEN,SPE,F1,Acc,plot_ROC,w,varargout]=cal_kfold_times(nSubj,kfoldout,All_Feat,meth_Net,label,lambda_lasso)
 cpred = zeros(nSubj,1);
 acc = zeros(nSubj,1);
 score = zeros(nSubj,1);
@@ -361,10 +406,13 @@ for fdout=1:c_out.NumTestSets
         midw=lasso(Train_data,Train_lab,'Lambda',lambda_lasso);  % parameter lambda for sparsity
         Train_data=Train_data(:,midw~=0);
         Test_data=Test_data(:,midw~=0);
+        feature_index_ttest{fdout}=p;
+        feature_index_lasso{fdout}=midw;
     else
         midw=lasso(Train_data,Train_lab,'Lambda',lambda_lasso);  % parameter lambda for sparsity
         Train_data=Train_data(:,midw~=0);
         Test_data=Test_data(:,midw~=0);
+        feature_index_lasso{fdout}=midw;
     end
     % Feature normalization ag
     Mtr=mean(Train_data);
@@ -378,9 +426,18 @@ for fdout=1:c_out.NumTestSets
     classmodel=svmtrain(Train_lab,Train_data,'-t 0 -c 1 -q'); % linear SVM (require LIBSVM toolbox)
     % classify ag
     %[A,V,C]=svmpredict(telabel,teFe,classmodel,'-q');
+    w{fdout}=classmodel.SVs'*classmodel.sv_coef;
     [cpred(test(c_out,fdout)),~,score(test(c_out,fdout))]=svmpredict(Test_lab,Test_data,classmodel,'-q');
 end
 
 Acc=100*sum(cpred==label)/nSubj;
 [AUC,SEN,SPE,F1,plot_ROC]=perfeval_kfold(label,cpred,score);
+switch meth_Net
+    case {'SR','WSR','GSR','SLR','SGR','WSGR','SSGSR'}
+        varargout{1}=feature_index_ttest;
+        varargout{2}=feature_index_lasso;
+    case {'dHOFC'}
+        varargout{1}=feature_index_lasso;
+end
 
+    

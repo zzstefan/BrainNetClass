@@ -11,7 +11,7 @@
 % IDEA lab, https://www.med.unc.edu/bric/ideagroup
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
 
-function [AUC,SEN,SPE,F1,Acc]=demo_framwk_kfold(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,k_fold)
+function [AUC,SEN,SPE,F1,Acc,w,varargout]=demo_framwk_kfold(k_fold,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label)
 %clc; clear; close all;
 
 % root=cd;
@@ -97,7 +97,14 @@ kfoldout=10;
 fprintf('Begin calculation process\n');
 rng('shuffle');
 for i=1:fold_times
-    [AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i}]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS);
+    switch meth_FS
+        case 't-test'
+            [AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),feature_index_ttest(i,:)]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS);
+        case 'LASSO'
+            [AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),feature_index_lasso(i,:)]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS);
+        case 't-test + LASSO'
+            [AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),feature_index_ttest(i,:),feature_index_lasso(i,:)]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS);
+    end       
 end
 rng('default');
 AUC=mean(AUC);
@@ -108,8 +115,46 @@ Acc=mean(Acc);
 ROC_kfold(plot_ROC,result_dir,fold_times);
 fprintf('End calculation process\n');
 
+switch meth_FS
+    case 't-test'
+        varargout{1}=feature_index_ttest;
+    case 'LASSO'
+        varargout{1}=feature_index_lasso;
+    case 't-test + LASSO'
+        varargout{1}=feature_index_ttest;
+        varargout{2}=feature_index_lasso;
+end
 
-function [AUC,SEN,SPE,F1,Acc,plot_ROC]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS)
+opt_BrainNet=BrainNet;
+label_negative=find(label==-1);
+label_positive=find(label==1);
+BrainNet_negative_mean=mean(opt_BrainNet(:,:,label_negative),3);
+BrainNet_positive_mean=mean(opt_BrainNet(:,:,label_positive),3);
+
+%figure;
+figure('visible','off');
+subplot(1,2,1);
+imagesc(BrainNet_positive_mean);
+colormap jet
+colorbar
+axis square
+xlabel('ROI');
+ylabel('ROI');
+title('label = -1');
+
+subplot(1,2,2);
+imagesc(BrainNet_negative_mean);
+colormap jet
+colorbar
+axis square
+xlabel('ROI');
+ylabel('ROI');
+title('label = 1');
+print(gcf,'-dtiffn',char(strcat(result_dir,'/Mean_optimal_network.tiff')));  
+    
+
+
+function [AUC,SEN,SPE,F1,Acc,plot_ROC,w,varargout]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS)
 c_out = cvpartition(nSubj,'k', kfoldout);
 cpred=zeros(nSubj,1);
 score=zeros(nSubj,1);
@@ -126,12 +171,14 @@ for fdout=1:c_out.NumTestSets
         [h,p]=ttest2(Train_data(Train_lab==-1,:),Train_data(Train_lab==1,:));
         Train_data=Train_data(:,p<pval);
         Test_data=Test_data(:,p<pval);
+        feature_index_ttest{fdout}=p;
     end
     % Lasso
     if any(strcmp(meth_FS,'LASSO'))
         midw=lasso(Train_data,Train_lab,'Lambda',0.1);  % parameter lambda for sparsity
         Train_data=Train_data(:,midw~=0);
         Test_data=Test_data(:,midw~=0);
+        feature_index_lasso{fdout}=midw;
     end
     
     if any(strcmp(meth_FS,'t-test + LASSO'))
@@ -143,6 +190,9 @@ for fdout=1:c_out.NumTestSets
         midw=lasso(Train_data,Train_lab,'Lambda',0.1);  % parameter lambda for sparsity
         Train_data=Train_data(:,midw~=0);
         Test_data=Test_data(:,midw~=0);
+        
+        feature_index_ttest{fdout}=p;
+        feature_index_lasso{fdout}=midw;
     end
     
     
@@ -156,9 +206,19 @@ for fdout=1:c_out.NumTestSets
     Test_data=Test_data./repmat(Str,size(Test_data,1),1);
     % train SVM model
     classmodel=svmtrain(Train_lab,Train_data,'-t 0 -c 1 -q'); % linear SVM (require LIBSVM toolbox)
+    w{fdout}=classmodel.SVs'*classmodel.sv_coef;
     % classify
     [cpred(test(c_out,fdout)),~,score(test(c_out,fdout))]=svmpredict(Test_lab,Test_data,classmodel,'-q');
 end
 Acc=100*sum(cpred==label)/nSubj;
 [AUC,SEN,SPE,F1,plot_ROC]=perfeval_kfold(label,cpred,score);
 
+switch meth_FS
+    case 't-test'
+        varargout{1}=feature_index_ttest;
+    case 'LASSO'
+        varargout{1}=feature_index_lasso;
+    case 't-test + LASSO'
+        varargout{1}=feature_index_ttest;
+        varargout{2}=feature_index_lasso;
+end

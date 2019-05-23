@@ -33,7 +33,7 @@ ylabel('True Positive Rate');
 title(['ROC curve of (AUC = ' num2str(auc) ' )']);
 %print(gcf,'-dtiff','./result/ROC.tiff');
 %print(gcf,'-dtiff',char(strcat(result_dir,'/ROC.tiff')));
-print(gcf,'-dtiffn',char(strcat(result_dir,'/ROC_tiffn.tiff')));
+print(gcf,'-dtiffn',char(strcat(result_dir,'/ROC.tiff')));
 %print(gcf,'-depsc',char(strcat(result_dir,'/ROC_epsc.eps')));
 
 

@@ -11,7 +11,7 @@
 % IDEA lab, https://www.med.unc.edu/bric/ideagroup
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
 
-function [AUC,SEN,SPE,F1,Acc]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label)
+function [AUC,SEN,SPE,F1,Acc,w,varargout]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label)
 %clc; clear; close all;
 
 % root=cd;
@@ -112,12 +112,14 @@ for i=1:nSubj
         [h,p]=ttest2(trFe(trlabel==-1,:),trFe(trlabel==1,:));
         trFe=trFe(:,p<pval);
         teFe=teFe(:,p<pval);
+        feature_index_ttest{i}=p;
     end
     % Lasso
     if any(strcmp(meth_FS,'LASSO'))
         midw=lasso(trFe,trlabel,'Lambda',0.1);  % parameter lambda for sparsity
         trFe=trFe(:,midw~=0);
         teFe=teFe(:,midw~=0);
+        feature_index_lasso{i}=midw;
     end
     
     if any(strcmp(meth_FS,'t-test + LASSO'))
@@ -129,6 +131,8 @@ for i=1:nSubj
         midw=lasso(trFe,trlabel,'Lambda',0.1);  % parameter lambda for sparsity
         trFe=trFe(:,midw~=0);
         teFe=teFe(:,midw~=0);
+        feature_index_ttest{i}=p;
+        feature_index_lasso{i}=midw;
     end
     
     
@@ -142,9 +146,50 @@ for i=1:nSubj
     teFe=teFe./Str;
     % train SVM model
     classmodel=svmtrain(trlabel,trFe,'-t 0 -c 1 -q'); % linear SVM (require LIBSVM toolbox)
+    w{i}=classmodel.SVs'*classmodel.sv_coef;
     % classify
     [cpred(i,1),acc,score(i,1)]=svmpredict(label(i),teFe,classmodel,'-q');
 end
 Acc=100*sum(cpred==label)/nSubj;
 [AUC,SEN,SPE,F1,~]=perfeval(label,cpred,score,result_dir);
 fprintf('End calculation process\n');
+
+switch meth_FS
+    case 't-test'
+        varargout{1}=feature_index_ttest;
+    case 'LASSO'
+        varargout{1}=feature_index_lasso;
+    case 't-test + LASSO'
+        varargout{1}=feature_index_ttest;
+        varargout{2}=feature_index_lasso;
+end
+
+opt_BrainNet=BrainNet;
+label_negative=find(label==-1);
+label_positive=find(label==1);
+BrainNet_negative_mean=mean(opt_BrainNet(:,:,label_negative),3);
+BrainNet_positive_mean=mean(opt_BrainNet(:,:,label_positive),3);
+
+%figure;
+figure('visible','off');
+subplot(1,2,1);
+imagesc(BrainNet_positive_mean);
+colormap jet
+colorbar
+axis square
+xlabel('ROI');
+ylabel('ROI');
+title('label = -1');
+
+subplot(1,2,2);
+imagesc(BrainNet_negative_mean);
+colormap jet
+colorbar
+axis square
+xlabel('ROI');
+ylabel('ROI');
+title('label = 1');
+print(gcf,'-dtiffn',char(strcat(result_dir,'/Mean_optimal_network.tiff')));  
+    
+
+

@@ -1,0 +1,13 @@
+aHOFC method is used to constructed the brain network and no parameter required.
+
+Using connection coefficients as features and t-test + LASSO for feature selection.
+
+Using leave-one-out cross validation to calculate the final results.
+
+
+Model evaluation result based on testing set:
+AUC:						0.62
+ACC:						60.00%
+SEN:						60.00%
+SPE:						60.00%
+F-score:						60.00%

@@ -14,7 +14,7 @@
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
 
 %% without sparse matrix
-function [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,varargin)
+function [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,varargout]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,varargin)
 switch meth_Net
     case {'SR','WSR','GSR'}
         lambda_1=varargin{1};
@@ -130,7 +130,7 @@ switch meth_Net
         num_W=length(W);
         parfor i=1:num_W % number of clusters
             for j=1:num_C
-                BrainNet{i,j}=dHOFC(BOLD,W(i),s,C(j));
+                [BrainNet{i,j},IDX{i,j}]=dHOFC(BOLD,W(i),s,C(j));
             end
         end
         BrainNet=reshape(BrainNet,1,num_W*num_C);
@@ -262,10 +262,13 @@ for i=1:nSubj
         midw=lasso(trFe,trlabel,'Lambda',lambda_lasso);  % parameter lambda for sparsity
         trFe=trFe(:,midw~=0);
         teFe=teFe(:,midw~=0);
+        feature_index_ttest{i}=p;
+        feature_index_lasso{i}=midw;
     else
         midw=lasso(trFe,trlabel,'Lambda',lambda_lasso);  % parameter lambda for sparsity
         trFe=trFe(:,midw~=0);
         teFe=teFe(:,midw~=0);
+        feature_index_lasso{i}=midw;
     end
     
     % Feature normalization ag
@@ -279,20 +282,28 @@ for i=1:nSubj
     % train SVM model ag
     classmodel=svmtrain(trlabel,trFe,'-t 0 -c 1 -q'); % linear SVM (require LIBSVM toolbox)
     % classify ag
+    w{i}=classmodel.SVs'*classmodel.sv_coef;
     [cpred(i),~,score(i)]=svmpredict(telabel,teFe,classmodel,'-q');
 end
 
 Acc=100*sum(cpred==label)/nSubj;
 [AUC,SEN,SPE,F1,~]=perfeval(label,cpred,score,result_dir);
 
-
+switch meth_Net
+    case {'SR','WSR','GSR','SLR','SGR','WSGR','SSGSR'}
+        varargout{1}=feature_index_ttest;
+        varargout{2}=feature_index_lasso;
+    case {'dHOFC'}
+        varargout{1}=feature_index_lasso;
+        varargout{2}=IDX;
+end
 
 if para_test_flag==1
     fprintf('Begin parameter sensitivity test\n');
     for i=1:length(All_Feat)
         Acc_para(i)=parameter_sensitivity_test_loocv(All_Feat{i},nSubj,label,meth_Net,lambda_lasso);
     end
-    save (char(strcat(result_dir,'/Acc_para.mat')),'Acc_para');
+    %save (char(strcat(result_dir,'/Acc_para.mat')),'Acc_para');
       switch meth_Net
             case {'SR','WSR','GSR'}
                 [opt_paramt]=select_para(meth_Net,Acc_para,lambda);
@@ -309,7 +320,7 @@ if para_test_flag==1
                 xlabel(sprintf('\x3bb_1'));
                 ylabel('Accuracy');
                 print(gcf,'-dtiffn',char(strcat(result_dir,'/para_sensitivity.tiff')));
-                print(gcf,'-depsc',char(strcat(result_dir,'/para_sensitivity_eps.eps')));
+                %print(gcf,'-depsc',char(strcat(result_dir,'/para_sensitivity.eps')));
              case {'SLR','SGR','WSGR','SSGSR'}
                  [opt_paramt]=select_para(meth_Net,Acc_para,lambda1,lambda2);
                  x=lambda1;
@@ -342,7 +353,7 @@ if para_test_flag==1
                      set(gca,'YTick',ind_y,'YTickLabel',y_label);
                  end
                  print(gcf,'-dtiffn',char(strcat(result_dir,'/para_sensitivity.tiff')));
-                 print(gcf,'-depsc',char(strcat(result_dir,'/para_sensitivity_eps.eps')));
+                 %print(gcf,'-depsc',char(strcat(result_dir,'/para_sensitivity.eps')));
              case 'dHOFC'
                  [opt_paramt]=select_para(meth_Net,Acc_para,W,C);
                  x=W;
@@ -378,6 +389,37 @@ if para_test_flag==1
                  %print(gcf,'-depsc',char(strcat(result_dir,'/para_sensitivity_eps.eps')));
       end
       fprintf('End parameter sensitivity test\n');
+else 
+    opt_paramt=[];
 end
+
+
+[~,B]=max(Acc_para);
+opt_BrainNet=BrainNet{B(1)};
+label_negative=find(label==-1);
+label_positive=find(label==1);
+BrainNet_negative_mean=mean(opt_BrainNet(:,:,label_negative),3);
+BrainNet_positive_mean=mean(opt_BrainNet(:,:,label_positive),3);
+
+figure;
+%figure('visible','off');
+subplot(1,2,1);
+imagesc(BrainNet_positive_mean);
+colormap jet
+colorbar
+axis square
+xlabel('ROI');
+ylabel('ROI');
+title('label = -1');
+
+subplot(1,2,2);
+imagesc(BrainNet_negative_mean);
+colormap jet
+colorbar
+axis square
+xlabel('ROI');
+ylabel('ROI');
+title('label = 1');
+print(gcf,'-dtiffn',char(strcat(result_dir,'/Mean_optimal_network.tiff')));  
     
 
