@@ -606,7 +606,7 @@ end
 save (char(strcat(result_dir,'/result_features.mat')),'result_features');
 set(handles.Result_details,'HorizontalAlignment','left','Fontname','Calibri','FontSize',10,...
     'string',sprintf('AUC: %0.4g\nACC: %3.2f%%\nSEN: %3.2f%%\nSPE: %3.2f%%\nF-score: %3.2f%%',AUC,Acc,SEN,SPE,F1));
-
+uiwait(msgbox('Operation all finished!','modal'));
 % --- Executes on button press in select_dir.
 
 function select_dir_Callback(hObject, eventdata, handles)
