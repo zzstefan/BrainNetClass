@@ -241,7 +241,11 @@ elseif strcmpi(meth_Type,'Network Type II: Parameter Required')
     set(handles.sensitivity_test,'Enable','on');
     meth_Net='SR';
     handles.meth_Net=meth_Net;
+<<<<<<< HEAD
     set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Lambda controls sparsity'));
+=======
+    set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('\x3bb controlling sparsity'));
+>>>>>>> 64dabd9a46900261ae393ab1f8ccd619b0838903
     set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Connection coefficients as features'));
     set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('t-test (p<0.05) + LASSO for feature selection'));
     %guidata(hObject,handles);
@@ -641,7 +645,11 @@ end
 save (char(strcat(result_dir,'/result_features.mat')),'result_features');
 set(handles.Result_details,'HorizontalAlignment','left','Fontname','Calibri','FontSize',10,...
     'string',sprintf('AUC: %0.4g\nACC: %3.2f%%\nSEN: %3.2f%%\nSPE: %3.2f%%\nF-score: %3.2f%%',AUC,Acc,SEN,SPE,F1));
+<<<<<<< HEAD
 uiwait(msgbox('Classification Completed.','modal'));
+=======
+uiwait(msgbox('Operation all finished!','modal'));
+>>>>>>> 64dabd9a46900261ae393ab1f8ccd619b0838903
 % --- Executes on button press in select_dir.
 
 function select_dir_Callback(hObject, eventdata, handles)
