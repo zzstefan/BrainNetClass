@@ -27,7 +27,7 @@ function BrainNet=SGR(BOLD,lambda1,lambda2)
 %% basic setting, load data, basic statistics
 nSubj=length(BOLD);
 [TimePoint,RegionNum]=size(BOLD{1});
-BrainNet=zeros(RegionNum,RegionNum,nSubj);
+BrainNet=zeros(RegionNum,RegionNum,nSubj,'single');
 Bins=100;
 opts=[];
 % Starting point

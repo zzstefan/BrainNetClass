@@ -14,7 +14,7 @@ function BrainNet=PC(BOLD)
 
 [nTime,nROI]=size(BOLD{1});
 nSubj=length(BOLD);
-BrainNet=zeros(nROI,nROI,nSubj);
+BrainNet=zeros(nROI,nROI,nSubj,'single');
 for i=1:nSubj
     temp=corr(BOLD{i});
     temp=temp-diag(diag(temp));    % remove selfconnection (set to zeros)

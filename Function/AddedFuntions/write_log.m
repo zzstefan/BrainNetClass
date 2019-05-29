@@ -211,7 +211,7 @@ switch meth_Net
         xlabel('\lambda','Fontsize',13);
         ylabel('Frequency of occurrence (%)');
         title(['Occurrence frequency of parameter(s)']);
-        print(gcf,'-depsc',char(strcat(result_dir,'/paprameter_occurrence.eps')));
+        print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/paprameter_occurrence.tiff')));
     case {'SGR','WSGR','SLR','SSGSR'}
         lambda_1=varargin{1};
         lambda_2=varargin{2};
@@ -239,7 +239,7 @@ switch meth_Net
         xlabel('\lambda_1 and \lambda_2','Fontsize',13);
         ylabel('Frequency of occurrence (%)');
         title(['Occurrence frequency of parameter(s)']);
-        print(gcf,'-depsc',char(strcat(result_dir,'/paprameter_occurrence.eps')));
+        print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/paprameter_occurrence.tiff')));
     case 'dHOFC'
         W=varargin{1};
         C=varargin{2};
@@ -267,5 +267,5 @@ switch meth_Net
         xlabel('Window length and number of clusters');
         ylabel('Frequency of occurrence (%)');
         title(['Occurrence frequency of parameter(s)']);
-        print(gcf,'-dtiffn',char(strcat(result_dir,'/paprameter_occurrence.tiff')));
+        print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/paprameter_occurrence.tiff')));
 end

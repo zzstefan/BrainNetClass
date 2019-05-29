@@ -20,7 +20,7 @@ function BrainNet=tHOFC(BOLD)
 
 [nTime,nROI]=size(BOLD{1});
 nSubj=length(BOLD);
-BrainNet=zeros(nROI,nROI,nSubj);
+BrainNet=zeros(nROI,nROI,nSubj,'single');
 
 % Compute low-order FC network
 pc=PC(BOLD);   % Pearson's correlation-based network

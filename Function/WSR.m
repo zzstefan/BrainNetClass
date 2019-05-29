@@ -29,7 +29,7 @@ function [BrainNet]=WSR(BOLD,lambda)
 %% Main code
 nSubj=length(BOLD);
 [TimePoint,RegionNum]=size(BOLD{1});
-BrainNet=zeros(RegionNum,RegionNum,nSubj);
+BrainNet=zeros(RegionNum,RegionNum,nSubj,'single');
 parameter=lambda;
 Total_Data=zeros(nSubj,TimePoint,RegionNum);
 Corr_Record=zeros(nSubj,RegionNum,RegionNum-1);

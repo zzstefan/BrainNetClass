@@ -28,13 +28,13 @@ figure('visible','off');
 plot(stack_x,stack_y,'LineWidth',2);
 set(gca,'XTick',[0:0.1:1]);
 %hold on
+axis square;
 xlabel('False Positive Rate');
 ylabel('True Positive Rate');
 title(['ROC curve of (AUC = ' num2str(auc) ' )']);
-%print(gcf,'-dtiff','./result/ROC.tiff');
-%print(gcf,'-dtiff',char(strcat(result_dir,'/ROC.tiff')));
-print(gcf,'-dtiffn',char(strcat(result_dir,'/ROC.tiff')));
-%print(gcf,'-depsc',char(strcat(result_dir,'/ROC_epsc.eps')));
+
+print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/ROC.tiff')));
+
 
 
 fprintf('Testing set AUC: %g\n',auc);

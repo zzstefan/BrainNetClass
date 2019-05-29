@@ -189,7 +189,7 @@ axis square
 xlabel('ROI');
 ylabel('ROI');
 title('label = 1');
-print(gcf,'-dtiffn',char(strcat(result_dir,'/Mean_optimal_network.tiff')));  
-    
-
+print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/Mean_optimal_network.tiff')));  
+save (char(strcat(result_dir,'/Mean_optimal_negativeLabel_network_.mat')),'BrainNet_negative_mean');
+save (char(strcat(result_dir,'/Mean_optimal_positiveLabel_network_.mat')),'BrainNet_positive_mean');
 

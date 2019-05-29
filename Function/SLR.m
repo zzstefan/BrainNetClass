@@ -31,7 +31,7 @@ opts.z=lambda2;
 %% Construct FC networks using sparse low-rank representation
 [nTime,nROI]=size(BOLD{1});
 nSubj=length(BOLD);
-BrainNet=zeros(nROI,nROI,nSubj);
+BrainNet=zeros(nROI,nROI,nSubj,'single');
 for i=1:nSubj
     temp=BOLD{i};
     temp=temp-repmat(mean(temp,2),1,nROI);     % centralization

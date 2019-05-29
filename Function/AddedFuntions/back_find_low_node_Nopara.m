@@ -1,5 +1,5 @@
 %%find SR-based brain network construction method features
-function [result_features]=back_find_low_node_Nopara(nROI,w,cross_val,meth_FEX,meth_FS,varargin)
+function [result_features]=back_find_low_node_Nopara(result_dir,nSubj,k_times,nROI,w,cross_val,meth_FEX,meth_FS,varargin)
 % 
  %clear all
 % load SR_10_fold_middle.mat;
@@ -152,8 +152,8 @@ elseif strcmpi(cross_val,'loocv')
 end
 
 if strcmpi(meth_FEX,'coef')
-    matrix_1=eye(nROI,nROI);
-    matrix_2=eye(nROI,nROI);
+    matrix_1=zeros(nROI,nROI);
+    matrix_2=zeros(nROI,nROI);
     for m=1:size(out,1)
         matrix_1(out{m,1}(1),out{m,1}(2))=all_weight(m);
         matrix_1(out{m,1}(2),out{m,1}(1))=all_weight(m);
@@ -161,7 +161,7 @@ if strcmpi(meth_FEX,'coef')
         matrix_2(out{m,1}(2),out{m,1}(1))=out{m,2};
     end
     result_features{1}=matrix_1;
-    result_features{2}=matrix_2;
+    %result_features{2}=matrix_2;
     
 elseif strcmpi(meth_FEX,'clus')
     matrix_1=zeros(1,nROI);
@@ -171,8 +171,37 @@ elseif strcmpi(meth_FEX,'clus')
         matrix_2(out{m,1})=out{m,2};
     end
     result_features{1}=matrix_1;
-    result_features{2}=matrix_2;
+    %result_features{2}=matrix_2;
 end
+if strcmpi(cross_val,'loocv')
+    matrix_2=matrix_2/nSubj;
+elseif strcmpi(cross_val,'10-fold')
+    matrix_2=matrix_2/(10*k_times);
+end
+result_features{2}=matrix_2;
+
+if strcmpi(meth_FEX,'coef')
+    figure('visible','off');
+    subplot(1,2,1);
+    imagesc(matrix_1);
+    colormap jet
+    colorbar
+    axis square
+    xlabel('ROI');
+    ylabel('ROI');
+    title('Averaged weight');
+    
+    subplot(1,2,2);
+    imagesc(matrix_2);
+    colormap jet
+    colorbar
+    axis square
+    xlabel('ROI');
+    ylabel('ROI');
+    title('Normalized occurence');
+    print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/result_features_weigthAndOccurence.tiff')));
+end
+
 fprintf('End finding features\n');
 % node_matrix=eye(116,116);
 % for i=1:length(NEW)

@@ -9,7 +9,7 @@ function [result_features]=back_find_high_node(W,C,nROI,w,midw_lasso,IDX,opt_t)
 % load dHOFC_loocv_middle.mat;
 %load dHOFC_kfold_middle.mat;
 fprintf('Begin finding features\n');
-midw_lasso=feature_index_lasso;
+
 
 for i =1:size(midw_lasso,1)
     for j=1:size(midw_lasso,2)
@@ -80,7 +80,7 @@ end
 %Matrix=create_matrix(first);
 
 for m=1:length(first)
-    node_matrix{m}=eye(nROI,nROI);
+    node_matrix{m}=zeros(nROI,nROI);
     for n=1:length(first{m})
         node_matrix{m}(first{m}(n,1),first{m}(n,2))=1;
         node_matrix{m}(first{m}(n,2),first{m}(n,1))=1;
@@ -103,6 +103,7 @@ result_features(:,2)=new_out(:,3);
 result_features(:,3)=node_matrix';
 result_features(:,4)=num2cell(W);
 result_features=sortrows(result_features,1,'descend');%% sort according to the frequency of each cluster ,descend
+
 fprintf('End network construction\n');
 
 

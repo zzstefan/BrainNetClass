@@ -27,7 +27,7 @@ function [BrainNet]=WSGR(BOLD,lambda1,lambda2)
 %% basic setting, load data, basic statistics
 nSubj=length(BOLD);
 [TimePoint,RegionNum]=size(BOLD{1});
-BrainNet=zeros(RegionNum,RegionNum,nSubj);
+BrainNet=zeros(RegionNum,RegionNum,nSubj,'single');
 NodeNum=(RegionNum-1)*RegionNum;
 Bins=100;
 opts=[];
@@ -71,9 +71,9 @@ for SubjectID=1:nSubj
         R(:,j)=r(Index,j);
     end
     %% Weight
-    %R_std=std(R(:));
-    %R_std=sqrt(sum(R(:).^2)/length(R(:)));
-    R_std=0.2;
+    R_std=std(R(:));
+    R_std=sqrt(sum(R(:).^2)/length(R(:)));
+    %R_std=0.2;
     WeightR=exp(-(R.^2)/R_std);
     %% mean std (0 1)
     subject=subject-repmat(mean(subject),TimePoint,1);

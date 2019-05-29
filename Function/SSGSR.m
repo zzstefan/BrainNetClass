@@ -50,8 +50,8 @@ opts.ind=[0:nTime:nTime*nSubj];       % set the group indices
 
 
 %% Construct FC networks using SSGSR
-BrainNet=zeros(nROI,nROI,nSubj);
-midNet=zeros(nROI-1,nROI,nSubj);
+BrainNet=zeros(nROI,nROI,nSubj,'single');
+%midNet=zeros(nROI-1,nROI,nSubj);
 
 % Compute Pearson's correlation (PC) network
 

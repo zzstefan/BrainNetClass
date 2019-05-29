@@ -319,7 +319,7 @@ if para_test_flag==1
                 set(gca,'XTickLabel',x_label);
                 xlabel(sprintf('\x3bb_1'));
                 ylabel('Accuracy');
-                print(gcf,'-dtiffn',char(strcat(result_dir,'/para_sensitivity.tiff')));
+                print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/para_sensitivity.tiff')));
                 %print(gcf,'-depsc',char(strcat(result_dir,'/para_sensitivity.eps')));
              case {'SLR','SGR','WSGR','SSGSR'}
                  [opt_paramt]=select_para(meth_Net,Acc_para,lambda1,lambda2);
@@ -352,7 +352,7 @@ if para_test_flag==1
                      ind_y=1:length(y);
                      set(gca,'YTick',ind_y,'YTickLabel',y_label);
                  end
-                 print(gcf,'-dtiffn',char(strcat(result_dir,'/para_sensitivity.tiff')));
+                 print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/para_sensitivity.tiff')));
                  %print(gcf,'-depsc',char(strcat(result_dir,'/para_sensitivity.eps')));
              case 'dHOFC'
                  [opt_paramt]=select_para(meth_Net,Acc_para,W,C);
@@ -385,7 +385,7 @@ if para_test_flag==1
                      ind_y=1:length(y);
                      set(gca,'YTick',ind_y,'YTickLabel',y_label);
                  end
-                 print(gcf,'-dtiffn',char(strcat(result_dir,'/para_sensitivity.tiff')));
+                 print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/para_sensitivity.tiff')));
                  %print(gcf,'-depsc',char(strcat(result_dir,'/para_sensitivity_eps.eps')));
       end
       fprintf('End parameter sensitivity test\n');
@@ -420,6 +420,7 @@ axis square
 xlabel('ROI');
 ylabel('ROI');
 title('label = 1');
-print(gcf,'-dtiffn',char(strcat(result_dir,'/Mean_optimal_network.tiff')));  
-    
+print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/Mean_optimal_network.tiff')));  
+save (char(strcat(result_dir,'/Mean_optimal_negativeLabel_network_.mat')),'BrainNet_negative_mean');
+save (char(strcat(result_dir,'/Mean_optimal_positiveLabel_network_.mat')),'BrainNet_positive_mean');    
 

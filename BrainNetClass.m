@@ -211,9 +211,9 @@ function net_method_Callback(hObject, eventdata, handles)
 popStrings_net = cellstr(get(hObject,'String')); 
 meth_Type=popStrings_net{get(hObject,'Value')};
 No_parameter={'PC','tHOFC','aHOFC'};
-Parameter_needed={'SR','WSR','SLR','WSGR','GSR','SSGSR','SLR','dHOFC'};
+Parameter_needed={'SR','WSR','SGR','WSGR','GSR','SSGSR','SLR','dHOFC'};
 if strcmpi(meth_Type,'Network Type I:  No Parameter Required')
-    %set(handles.method_choice, 'value', 1);
+    set(handles.method_choice, 'value', 1);
     set(handles.method_choice,'String',No_parameter);
     set(handles.lambda1,'Enable','off');
     set(handles.lambda2,'Enable','off');
@@ -224,21 +224,26 @@ if strcmpi(meth_Type,'Network Type I:  No Parameter Required')
     set(handles.sensitivity_test,'Enable','off');
     set(handles.fe_method,'Enable','on');
     set(handles.fs_method,'Enable','on');
+    set(handles.fe_method,'Value',1);
+    set(handles.fs_method,'Value',1);
     set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf(''));
     set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf(''));
+    set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf(''));
 elseif strcmpi(meth_Type,'Network Type II: Parameter Required')
     set(handles.fs_method,'Value',4);
     set(handles.fe_method,'Value',2);
     set(handles.fe_method,'Enable','off');
     set(handles.fs_method,'Enable','off');
     set(handles.lambda1,'Enable','on','String',mat2str(handles.default.lambda_1));
+    set(handles.sensitivity_test,'Value',1);
     %set(handles.method_choice, 'value', 1);
     set(handles.method_choice,'String',Parameter_needed);
     set(handles.sensitivity_test,'Enable','on');
     meth_Net='SR';
     handles.meth_Net=meth_Net;
-    set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('\x3bb controlling sparsity'));
-    set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Connection coefficients as features \nt-test (p<0.05) + LASSO for feature selection'));
+    set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Lambda controls sparsity'));
+    set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Connection coefficients as features'));
+    set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('t-test (p<0.05) + LASSO for feature selection'));
     %guidata(hObject,handles);
     if isfield(handles,'meth_Net')
         switch meth_Net
@@ -392,29 +397,29 @@ guidata(hObject,handles);
 
 switch meth_Net
     case {'SR','WSR'}
-        set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('\x3bb controlling sparsity'));
+        set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Lambda controls sparsity'));
         set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Connection coefficients as features'));
         set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('t-test (p<0.05) + LASSO for feature selection'));
     case 'GSR'
-        set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('\x3bb controlling group sparsity'));
-        set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Connection coefficients as features \nt-test (p<0.05) + LASSO for feature selection'));
-        set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Connection coefficients as features \nt-test (p<0.05) + LASSO for feature selection'));
+        set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Lambda controls group sparsity'));
+        set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Connection coefficients as features'));
+        set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('t-test (p<0.05) + LASSO for feature selection'));
     case 'SLR'
-        set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('\x3bb_1 controlling low_rank \n\x3bb_2 controlling sparsity'));
+        set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Lambda 1 controls low_rank \nLambda 2 controls sparsity'));
         set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Connection coefficients as features'));
         set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('t-test (p<0.05) + LASSO for feature selection'));
     case {'SGR','WSGR'}
         set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',...
-            sprintf('\x3bb_1 controlling sparsity \n\x3bb_2 controlling group sparsity'));
+            sprintf('Lambda 1 controls sparsity \nLambda 2 controls group sparsity'));
         set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Connection coefficients as features'));
         set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('t-test (p<0.05) + LASSO for feature selection'));
     case 'SSGSR'
         set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',...
-            sprintf('\x3bb_1 controlling group sparsity \n\x3bb_2 controlling inter-subject LOFC-pattern similarity'));
+            sprintf('Lambda 1 controls group sparsity \nLambda 2 controls inter-subject LOFC-pattern similarity'));
         set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Connection coefficients as features'));
         set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('t-test (p<0.05) + LASSO for feature selection'));
     case 'dHOFC'
-        set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('step normally set to 1'));
+        set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Step normally set to 1'));
         set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Local clustering coefficients as features'));
         set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('LASSO for feature selection'));
 end
@@ -488,8 +493,9 @@ sign_FS=isfield(handles,'pop_choice_fs');
 
 switch handles.meth_Type
     case 'Network Type I:  No Parameter Required'
-        sign_all_char={'input data','output directory','label','feature extraction method','feature selection method'};
-        sign_all_char=string(sign_all_char);
+       sign_all_char={'input data','output directory','label','feature extraction method','feature selection method'};
+        sign_all_char=cellstr(sign_all_char);
+        
         sign_all=[sign_input,sign_output,sign_label,sign_FEX,sign_FS];
         if sum(sign_all)<5
             index=find(sign_all==0);
@@ -508,7 +514,7 @@ switch handles.meth_Type
         end
     case 'Network Type II: Parameter Required'
         sign_all_char={'input data','output directory','label','parameter sensitivity test'};
-        sign_all_char=string(sign_all_char);
+        sign_all_char=cellstr(sign_all_char);
         sign_all=[sign_input,sign_output,sign_label,handles.sensitivity_test.Value];
         if sum(sign_all)<4
             index=find(sign_all==0);
@@ -530,6 +536,9 @@ end
 BOLD=handles.BOLD;
 [~,nROI]=size(BOLD{1});
 label=handles.label;
+nSubj=length(label);
+
+
 result_dir=handles.result_dir;
 if handles.sensitivity_test.Value==1
     para_test_flag=1;
@@ -541,59 +550,86 @@ if strcmpi(handles.meth_Type,'Network Type I:  No Parameter Required')
     meth_Net=handles.meth_Net;
     meth_FEX=handles.pop_choice_fe;
     meth_FS=handles.pop_choice_fs;
+    
+%     memory_needed=nSubj*nROI*nROI*4/(1024*1024*1024);
+%     msg=sprintf('The whole program needs at least %3.4f GB memory to run.',memory_needed);
+%     uiwait(msgbox({msg,'If your the RAM of your computer is not enough,','you may change to another computer with larger RAM','or switch to the no-parameter required construction method!'},'modal','warn'));
+%     
     if strcmpi(handles.cross_val,'loocv')
         switch meth_FS
             case 't-test'
                 [AUC,SEN,SPE,F1,Acc,w,feature_index_ttest]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
-                [result_features]=back_find_low_node_Nopara(nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest);
+                [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest);
             case 'LASSO'
                 [AUC,SEN,SPE,F1,Acc,w,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
-                [result_features]=back_find_low_node_Nopara(nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_lasso);
+                [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_lasso);
             case 't-test + LASSO'
                 [AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
-                [result_features]=back_find_low_node_Nopara(nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest,feature_index_lasso);
+                [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest,feature_index_lasso);
         end
     elseif strcmpi(handles.cross_val,'10-fold')
         switch meth_FS
             case 't-test'
                 [AUC,SEN,SPE,F1,Acc,w,feature_index_ttest]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
-                [result_features]=back_find_low_node_Nopara(nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest);
+                [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest);
             case 'LASSO'
                 [AUC,SEN,SPE,F1,Acc,w,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
-                [result_features]=back_find_low_node_Nopara(nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_lasso);
+                [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_lasso);
             case 't-test + LASSO'
                 [AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
-                [result_features]=back_find_low_node_Nopara(nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest,feature_index_lasso);
+                [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest,feature_index_lasso);
         end
     end
         write_log(result_dir,meth_Net,handles.cross_val,AUC,SEN,SPE,F1,Acc,meth_FEX,meth_FS,handles.default.k_times,handles.default.lasso_lambda);
 else
-        meth_Net=handles.meth_Net;
-        if strcmpi(handles.cross_val,'loocv')
-            switch meth_Net
-                case {'SR','WSR','GSR'}
-                    [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lasso_lambda);
-                case {'SLR','SGR','WSGR','SSGSR'}
-                    [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lambda_2,handles.default.lasso_lambda);
-                case 'dHOFC'
-                    [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_lasso,IDX]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.window_length,handles.default.step,handles.default.clusters,handles.default.lasso_lambda);
-            end
-        elseif strcmpi(handles.cross_val,'10-fold')
-            switch meth_Net
-                case {'SR','WSR','GSR'}
-                    [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lasso_lambda);
-                case {'SLR','SGR','WSGR','SSGSR'}
-                    [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lambda_2,handles.default.lasso_lambda);
-                case 'dHOFC'
-                    [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_lasso,IDX]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.window_length,handles.default.step,handles.default.clusters,handles.default.lasso_lambda);
-            end
-        end
+
+    meth_Net=handles.meth_Net;
     switch meth_Net
         case {'SR','WSR','GSR'}
-            [result_features]=back_find_low_node_para(nROI,w,handles.cross_val,feature_index_ttest,feature_index_lasso);
+            memory_needed=nSubj*nROI*nROI*4*length(handles.default.lambda_1)/(1024*1024*1024);
+        case {'SLR','SGR','WSGR','SSGSR'}
+            memory_needed=nSubj*nROI*nROI*4*length(handles.default.lambda_1)*length(handles.default.lambda_2)/(1024*1024*1024);
+        case 'dHOFC'
+            memory_needed=sum(nSubj*4*length(handles.default.window_length)*(handles.default.clusters.*handles.default.clusters))/(1024*1024*1024);
+    end
+    msg=sprintf('The whole program needs at least %3.4f GB memory to run.',memory_needed);
+    answer=questdlg({msg,'If your the RAM of your computer is not enough,','you may change to another computer with larger RAM','or switch to the no-parameter required construction method!'},...
+        'Warning','Continue','Stop','Continue');
+    switch answer
+        case 'Continue'
+            return;
+        case 'Stop'
+            error('Stop by user.');
+    end
+
+    
+    if strcmpi(handles.cross_val,'loocv')
+        switch meth_Net
+            case {'SR','WSR','GSR'}
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lasso_lambda);
+            case {'SLR','SGR','WSGR','SSGSR'}
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lambda_2,handles.default.lasso_lambda);
+            case 'dHOFC'
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_lasso,IDX]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.window_length,handles.default.step,handles.default.clusters,handles.default.lasso_lambda);
+        end
+    elseif strcmpi(handles.cross_val,'10-fold')
+        switch meth_Net
+            case {'SR','WSR','GSR'}
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lasso_lambda);
+            case {'SLR','SGR','WSGR','SSGSR'}
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lambda_2,handles.default.lasso_lambda);
+            case 'dHOFC'
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_lasso,IDX]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.window_length,handles.default.step,handles.default.clusters,handles.default.lasso_lambda);
+        end
+    end
+    
+    
+    switch meth_Net
+        case {'SR','WSR','GSR'}
+            [result_features]=back_find_low_node_para(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,feature_index_ttest,feature_index_lasso);
             write_log(result_dir,meth_Net,handles.cross_val,AUC,SEN,SPE,F1,Acc,handles.default.lambda_1,handles.default.lasso_lambda,opt_paramt,handles.default.k_times,opt_t);
         case {'SGR','WSGR','SSGSR','SLR'}
-            [result_features]=back_find_low_node_para(nROI,w,handles.cross_val,feature_index_ttest,feature_index_lasso);
+            [result_features]=back_find_low_node_para(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,feature_index_ttest,feature_index_lasso);
             write_log(result_dir,meth_Net,handles.cross_val,AUC,SEN,SPE,F1,Acc,handles.default.lambda_1,handles.default.lambda_2,handles.default.lasso_lambda,opt_paramt,handles.default.k_times,opt_t);
         case 'dHOFC'
             [result_features]=back_find_high_node(handles.default.window_length,handles.default.clusters,nROI,w,feature_index_lasso,IDX,opt_t);
@@ -605,7 +641,7 @@ end
 save (char(strcat(result_dir,'/result_features.mat')),'result_features');
 set(handles.Result_details,'HorizontalAlignment','left','Fontname','Calibri','FontSize',10,...
     'string',sprintf('AUC: %0.4g\nACC: %3.2f%%\nSEN: %3.2f%%\nSPE: %3.2f%%\nF-score: %3.2f%%',AUC,Acc,SEN,SPE,F1));
-
+uiwait(msgbox('Classification Completed.','modal'));
 % --- Executes on button press in select_dir.
 
 function select_dir_Callback(hObject, eventdata, handles)
@@ -634,9 +670,9 @@ set(handles.data_dir,'string',folderName);
 
 dirOutput=dir(fullfile(folderName,'*.txt'));
 fileName={dirOutput.name}';
-folder={dirOutput.folder}';
+%folder={dirOutput.folder}';
 for i=1:length(fileName)
-    BOLD{i,1}=load([folder{i},'/',fileName{i}]);
+    BOLD{i,1}=load([folderName,'/',fileName{i}]);
 end
 
 handles.BOLD=BOLD;

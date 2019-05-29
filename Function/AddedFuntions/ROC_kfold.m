@@ -36,5 +36,6 @@ hold on
 plot(x_label,y_label,'k');
 xlabel('False Positive Rate');
 ylabel('True Positive Rate');
-title(['ROC curve of 10-times']);
-print(gcf,'-dtiff',char(strcat(result_dir,'/ROC.tiff')));
+title(['ROC curve of 10-fold']);
+axis square;
+print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/ROC.tiff')));

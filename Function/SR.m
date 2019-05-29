@@ -30,7 +30,7 @@ opts.lFlag=0;   % Nemirovski's line search
 %% Construct FC networks using sparse representation
 [nTime,nROI]=size(BOLD{1});
 nSubj=length(BOLD);
-BrainNet=zeros(nROI,nROI,nSubj);
+BrainNet=zeros(nROI,nROI,nSubj,'single');
 for i=1:nSubj
     temp=BOLD{i};
     temp=temp-repmat(mean(temp,2),1,nROI);     % centralization

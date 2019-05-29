@@ -64,7 +64,7 @@ for j = 1:numCluster
     Tmp11(:,j) = mean(All_dFC(:,find(IDX == j)),2);   % calculate mean dynamic FC of each cluster
 end
 
-BrainNet = zeros(numCluster,numCluster,nSubj);
+BrainNet = zeros(numCluster,numCluster,nSubj,'single');
 for i = 1:nSubj
     BrainNet(:,:,i) = corr(Tmp11(1+K*(i-1):K*i,:));   % calculate HOFC matrix
 end
