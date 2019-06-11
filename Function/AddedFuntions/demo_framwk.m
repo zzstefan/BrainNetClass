@@ -1,4 +1,4 @@
-function [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,varargout]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label)
+function [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,varargout]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,lambda_lasso)
 % This function is for classification problem that has no parameter(s) to
 % optimize.  Note that this function uses the LOOCV.
 
@@ -128,7 +128,7 @@ for i=1:nSubj
     end
     % Lasso
     if any(strcmp(meth_FS,'LASSO'))
-        midw=lasso(trFe,trlabel,'Lambda',0.1);  % parameter lambda for sparsity
+        midw=lasso(trFe,trlabel,'Lambda',lambda_lasso);  % parameter lambda for sparsity
         trFe=trFe(:,midw~=0);
         teFe=teFe(:,midw~=0);
         feature_index_lasso{i}=midw;
@@ -140,7 +140,7 @@ for i=1:nSubj
         trFe=trFe(:,p<pval);
         teFe=teFe(:,p<pval);
         
-        midw=lasso(trFe,trlabel,'Lambda',0.1);  % parameter lambda for sparsity
+        midw=lasso(trFe,trlabel,'Lambda',lambda_lasso);  % parameter lambda for sparsity
         trFe=trFe(:,midw~=0);
         teFe=teFe(:,midw~=0);
         feature_index_ttest{i}=p;
@@ -177,7 +177,7 @@ switch meth_FS
 end
 save_optimal_network(meth_Net,BrainNet,label,result_dir);
 
-lambda_lasso=0.1;
+
 save_model(BrainNet,meth_Net,label,result_dir,meth_FEX,meth_FS,lambda_lasso);
 
 

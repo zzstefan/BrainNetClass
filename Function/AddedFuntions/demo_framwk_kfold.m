@@ -1,4 +1,4 @@
-function [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,varargout]=demo_framwk_kfold(k_fold,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label)
+function [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,varargout]=demo_framwk_kfold(k_fold,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,lambda_lasso)
 % This function is for classification problem that has no parameter(s) to
 % optimize.  Note that this function uses the 10-fold.
 

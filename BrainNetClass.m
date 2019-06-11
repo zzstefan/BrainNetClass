@@ -595,25 +595,25 @@ if strcmpi(handles.meth_Type,'Network Type I:  No Parameter Required')
     if strcmpi(handles.cross_val,'loocv')
         switch meth_FS
             case 't-test'
-                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest);
             case 'LASSO'
-                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_lasso);
             case 't-test + LASSO'
-                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest,feature_index_lasso);
         end
     elseif strcmpi(handles.cross_val,'10-fold')
         switch meth_FS
             case 't-test'
-                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest);
             case 'LASSO'
-                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_lasso);
             case 't-test + LASSO'
-                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest,feature_index_lasso);
         end
     end
