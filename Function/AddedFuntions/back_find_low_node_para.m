@@ -1,6 +1,30 @@
-%%find SR-based brain network construction method features
 function [result_features]=back_find_low_node_para(result_dir,nSubj,k_times,nROI,w,cross_val,ttest_p,midw_lasso)
-% 
+
+% This function aims to find features used in the classification, suitable
+% for the SR,SLR,SGR,GSR,WSR,WSGR,SSGSR network construction method. And also
+% suitable for the LOOCV or the 10-fold cross validation. The finding
+% features can be applied on the visualization software to present the
+% important brain regios.
+% Input:
+%         result_dir: the directory you want to store all the result files;
+%         nSubj: number of subjects;
+%         k_times: times of 10-fold cross validation;
+%         nROI: number of ROIs 
+%         w: weight of each selected features;
+%         cross_val: loocv or 10-fold;
+%         ttest_pm,midw_lasso: the feature selection indexes of ttest or
+%         lasso;
+%         
+% Output:
+%        result_features: cell array, consisting of the averaged weight and occurrence of the features;
+
+% Written by Zhen Zhou, zzstefan@email.unc.edu
+% IDEA lab, https://www.med.unc.edu/bric/ideagroup
+% Department of Radiology and BRIC, University of North Carolina at Chapel Hill
+% College of Computer Science, Zhejiang University, China
+
+
+
 % clear all
 % load SR_10_fold_middle.mat;
 % load SR_loocv_middle.mat;
@@ -81,26 +105,26 @@ elseif strcmpi(cross_val,'10-fold')
 end
 result_features{2}=matrix_2;
 
-if strcmpi(meth_FEX,'coef')
-    figure('visible','off');
-    subplot(1,2,1);
-    imagesc(matrix_1);
-    colormap jet
-    colorbar
-    axis square
-    xlabel('ROI');
-    ylabel('ROI');
-    title('Averaged weight');
-    
-    subplot(1,2,2);
-    imagesc(matrix_2);
-    colormap jet
-    colorbar
-    axis square
-    xlabel('ROI');
-    ylabel('ROI');
-    title('Normalized occurence');
-    print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/result_features_weigthAndOccurence.tiff')));
-end
+
+figure('visible','off');
+subplot(1,2,1);
+imagesc(matrix_1);
+colormap jet
+colorbar
+axis square
+xlabel('ROI');
+ylabel('ROI');
+title('Averaged weight');
+
+subplot(1,2,2);
+imagesc(matrix_2);
+colormap jet
+colorbar
+axis square
+xlabel('ROI');
+ylabel('ROI');
+title('Normalized occurence');
+print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/result_features_weigthAndOccurence.tiff')));
+
 
 fprintf('End finding features\n');

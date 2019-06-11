@@ -39,7 +39,7 @@ for i=1:nROI
 end
 
 K = floor((nTime-W)/s)+1;                % K: number of sliding window
-r = zeros(nROI,nROI,K);
+r = zeros(nROI,nROI,K,'single');
 All_dFC = [];
 for i = 1:nSubj
     D = BOLD{i};
@@ -53,17 +53,19 @@ for i = 1:nSubj
     B(:,pp) = [];
     All_dFC = [All_dFC;B];
 end
-
+clear r;
+fprintf('Clustering.\n');
 Dist = pdist(All_dFC');
 Y1 = linkage(Dist,'ward');
 
 IDX = cluster(Y1,'maxclust',numCluster); % clustering based on dynamic FC
 
-Tmp11 = zeros(size(All_dFC,1),numCluster);
+Tmp11 = zeros(size(All_dFC,1),numCluster,'single');
 for j = 1:numCluster
     Tmp11(:,j) = mean(All_dFC(:,find(IDX == j)),2);   % calculate mean dynamic FC of each cluster
 end
 
+clear All_dFC;
 BrainNet = zeros(numCluster,numCluster,nSubj,'single');
 for i = 1:nSubj
     BrainNet(:,:,i) = corr(Tmp11(1+K*(i-1):K*i,:));   % calculate HOFC matrix

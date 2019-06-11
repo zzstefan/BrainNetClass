@@ -1,18 +1,31 @@
-% This demo script is for classification problem that has parameter(s) to
+% This function is for classification problem that has parameter(s) to
 % optimize. If more parameters to be optimized, more inner LOOCV runs
 % (additional for-loop) should be used. All networks corresponding to
-% different combinations of parameters should be prepared beforehand. This
-% demo use network constructed by sparse representation (1 parameter to be
-% optimized), feature selection uses the simplest strategy (ttest2). 
-%
-% The inputs are networks and labels for all subjects, the output is
-% classification performance and the optimzed parameter(s).
-%
-% Created by Xiaobo Chen, 7/15/2017 xbchen82@gmail.com
-% Modified by Han Zhang, 8/2/2017 hanzhang@med.unc.edu
+% different combinations of parameters should be prepared beforehand. Note
+% that this function uses the 10-fold repeated by several times.
+
+% 
+% Input:
+%     result_dir: the directory you want to store all the results in;
+%     meth_Net: the brain network construction method;
+%     BOLD: time courses extracted using a template;
+%     label: the label for each subject; e.g., -1 for normal controls and 1 for patients;
+%     para_test_flag: whether or not to perform parameter sensitivity test.
+%     varargin: the different parameters for different brain network construction method;
+%     
+% Output:
+%     opt_paramt: the best parameter combination in the parameter sensitivity test;
+%     opt_t: the selected parameter combination in each parameter optimization fold;
+%     AUC,SEN,SPE,F1,Acc,Youden,BalanceAccuracy: model performance;
+%     w: weight of each selected features@email.unc.edu
+%     varargout: the feature selection index for the following finding features section.
+
+% Written by Zhen Zhou, zzstefan@email.unc.edu
 % IDEA lab, https://www.med.unc.edu/bric/ideagroup
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
-function [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,varargout]=kfold_param_select(k_fold,result_dir,meth_Net,BOLD,label,para_test_flag,varargin)
+% College of Computer Science, Zhejiang University, China
+
+function [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,varargout]=kfold_param_select(k_fold,result_dir,meth_Net,BOLD,label,para_test_flag,varargin)
 switch meth_Net
     case {'SR','WSR','GSR'}
         lambda_1=varargin{1};
@@ -51,12 +64,14 @@ switch meth_Net
         lambda=lambda_1; % parameter for sparsity
         parfor i=1:length(lambda)
             BrainNet{i}=SR(BOLD,lambda(i));
+            disp('.');
         end
         %save (char(strcat(dir,meth_Net,'_net.mat')),'BrainNet','-v7.3');
     case 'WSR'      % PC weighted SR
         lambda=lambda_1; % parameter for sparsity
         parfor i=1:length(lambda)
             BrainNet{i}=WSR(BOLD,lambda(i));
+            disp('.');
         end
         %save (char(strcat(dir,meth_Net,'_net.mat')),'BrainNet','-v7.3');
 
@@ -68,6 +83,7 @@ switch meth_Net
         parfor i=1:num_lambda1
             for j=1:num_lambda2
                 BrainNet{i,j}=SLR(BOLD,lambda1(i),lambda2(j));
+                disp('.');
             end 
         end
         BrainNet=reshape(BrainNet,1,num_lambda1*num_lambda2);
@@ -81,6 +97,7 @@ switch meth_Net
         parfor i=1:num_lambda1
             for j=1:num_lambda2
                 BrainNet{i,j}=SGR(BOLD,lambda1(i),lambda2(j));
+                disp('.');
             end
         end
         BrainNet=reshape(BrainNet,1,num_lambda1*num_lambda2);
@@ -94,6 +111,7 @@ switch meth_Net
         parfor i=1:num_lambda1
             for j=1:num_lambda2
                 BrainNet{i,j}=WSGR(BOLD,lambda1(i),lambda2(j));
+                disp('.');
             end
         end
         BrainNet=reshape(BrainNet,1,num_lambda1*num_lambda2);
@@ -103,6 +121,7 @@ switch meth_Net
         lambda=lambda_1;
         parfor i=1:length(lambda)
             BrainNet{i}=GSR(BOLD,lambda(i));
+            disp('.');
         end
         %save (char(strcat(dir,meth_Net,'_net.mat')),'BrainNet','-v7.3');
         
@@ -114,6 +133,7 @@ switch meth_Net
         parfor i=1:num_lambda1
             for j=1:num_lambda2
                 BrainNet{i,j}=SSGSR(BOLD,lambda1(i),lambda2(j));
+                disp('.');
             end
         end
         BrainNet=reshape(BrainNet,1,num_lambda1*num_lambda2);
@@ -125,6 +145,7 @@ switch meth_Net
         parfor i=1:num_W % number of clusters
             for j=1:num_C
                 [BrainNet{i,j},IDX{i,j}]=dHOFC(BOLD,W(i),s,C(j));
+                disp('.');
             end
         end
         BrainNet=reshape(BrainNet,1,num_W*num_C);
@@ -177,13 +198,14 @@ kfoldout=10;
 
 rng('shuffle');
 for i=1:fold_times
+    fprintf(1,'Begin 10-fold cross-validation time %d...\n',i);
     switch meth_Net
         case {'SR','WSR','GSR','SLR','SGR','WSGR','SSGSR'}
-            [opt_t(i,:),AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),feature_index_ttest(i,:),feature_index_lasso(i,:)]=cal_kfold_times(nSubj,kfoldout,All_Feat,meth_Net,label,lambda_lasso);
+            [opt_t(i,:),AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),Youden(i),BalanceAccuracy(i),feature_index_ttest(i,:),feature_index_lasso(i,:)]=cal_kfold_times(nSubj,kfoldout,All_Feat,meth_Net,label,lambda_lasso);
         case 'dHOFC'
-            [opt_t(i,:),AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),feature_index_lasso(i,:)]=cal_kfold_times(nSubj,kfoldout,All_Feat,meth_Net,label,lambda_lasso);
+            [opt_t(i,:),AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),Youden(i),BalanceAccuracy(i),feature_index_lasso(i,:)]=cal_kfold_times(nSubj,kfoldout,All_Feat,meth_Net,label,lambda_lasso);
     end
-    fprintf(1,'Begin fold %d...\n',i);
+    
 end
 rng('default');
 AUC=mean(AUC);
@@ -191,6 +213,15 @@ SEN=mean(SEN);
 SPE=mean(SPE);
 F1=mean(F1);
 Acc=mean(Acc);
+Youden=mean(Youden);
+BalanceAccuracy=mean(BalanceAccuracy);
+
+fprintf('Testing set AUC: %g\n',AUC);
+fprintf(1,'Testing set Sens: %3.2f%%\n',SEN);
+fprintf(1,'Testing set Spec: %3.2f%%\n',SPE);
+fprintf(1,'Testing set Youden: %3.2f%%\n',Youden);
+fprintf(1,'Testing set F-score: %3.2f%%\n',F1);
+fprintf(1,'Testing set BAC: %3.2f%%\n',BalanceAccuracy);
 ROC_kfold(plot_ROC,result_dir,fold_times);
 
 
@@ -213,6 +244,7 @@ if para_test_flag==1
       switch meth_Net
             case {'SR','WSR','GSR'}
                 [opt_paramt]=select_para(meth_Net,Acc_para,lambda);
+                save_model(BrainNet,meth_Net,label,result_dir,opt_paramt,Acc_para,lambda_lasso);
                 x=lambda;
                 for j=1:length(x)
                     x_label{j}=num2str(x(j));
@@ -225,9 +257,11 @@ if para_test_flag==1
                 set(gca,'XTickLabel',x_label);
                 xlabel(sprintf('\x3bb_1'));
                 ylabel('Accuracy');
+                title('Parameter sensitivity test');
                 print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/para_sensitivity.tiff')));
              case {'SLR','SGR','WSGR','SSGSR'}
                  [opt_paramt]=select_para(meth_Net,Acc_para,lambda1,lambda2);
+                 save_model(BrainNet,meth_Net,label,result_dir,opt_paramt,Acc_para,lambda_lasso);
                  x=lambda1;
                  y=lambda2;
                  for i=1:length(x)
@@ -238,10 +272,16 @@ if para_test_flag==1
                  end
                  z=reshape(Acc_para,num_lambda1,num_lambda2);
                  figure('visible','off');
-                 bar3(z');
+                 Bar1=bar3(z);
+                 for Element = 1:length(Bar1)
+                    ZData = get(Bar1(Element),'ZData');
+                    set(Bar1(Element), 'CData', ZData,...
+                        'FaceColor', 'interp');
+                 end
+                 colorbar
                  zlim([0,100]);
-                 xlabel(sprintf('\x3bb_1'));
-                 ylabel(sprintf('\x3bb_2'));
+                 xlabel(sprintf('\x3bb_2'));
+                 ylabel(sprintf('\x3bb_1'));
                  zlabel(sprintf('Accuracy'));
                  if length(x)>=8
                      ind_x=1:2:length(x);
@@ -257,9 +297,11 @@ if para_test_flag==1
                      ind_y=1:length(y);
                      set(gca,'YTick',ind_y,'YTickLabel',y_label);
                  end
+                 title('Parameter sensitivity test');
                  print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/para_sensitivity.tiff')));
              case 'dHOFC'
                  [opt_paramt]=select_para(meth_Net,Acc_para,W,C);
+                 save_model(BrainNet,meth_Net,label,result_dir,opt_paramt,Acc_para,lambda_lasso);
                  x=W;
                  y=C;
                  for i=1:length(x)
@@ -270,10 +312,16 @@ if para_test_flag==1
                  end
                  z=reshape(Acc_para,length(W),length(C));
                  figure('visible','off');
-                 bar3(z');
+                 Bar1=bar3(z');
+                 for Element = 1:length(Bar1)
+                     ZData = get(Bar1(Element),'ZData');
+                     set(Bar1(Element), 'CData', ZData,...
+                         'FaceColor', 'interp');
+                 end
+                 colorbar
                  zlim([0,100]);
-                 xlabel(sprintf('clusters'));
-                 ylabel(sprintf('windows length'));
+                 xlabel(sprintf('Window Length'));
+                 ylabel(sprintf('Number of Clusters'));
                  zlabel(sprintf('Accuracy'));
                  if length(x)>=8
                      ind_x=1:2:length(x);
@@ -289,42 +337,21 @@ if para_test_flag==1
                      ind_y=1:length(y);
                      set(gca,'YTick',ind_y,'YTickLabel',y_label);
                  end
+                 title('Parameter sensitivity test');
                  print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/para_sensitivity.tiff')));
       end
       fprintf('End parameter sensitivity test\n');
+      save_optimal_network(meth_Net,BrainNet,label,result_dir,Acc_para);
+      
+else
+    opt_paramt=[];
+    return;
 end
 
 
-[~,B]=max(Acc_para);
-opt_BrainNet=BrainNet{B(1)};
-label_negative=find(label==-1);
-label_positive=find(label==1);
-BrainNet_negative_mean=mean(opt_BrainNet(:,:,label_negative),3);
-BrainNet_positive_mean=mean(opt_BrainNet(:,:,label_positive),3);
 
-figure('visible','off');
-subplot(1,2,1);
-imagesc(BrainNet_positive_mean);
-colormap jet
-colorbar
-axis square
-xlabel('ROI');
-ylabel('ROI');
-title('label = -1')
 
-subplot(1,2,2);
-imagesc(BrainNet_negative_mean);
-colormap jet
-colorbar
-axis square
-xlabel('ROI');
-ylabel('ROI');
-title('label = 1')
-print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/Mean_optimal_network.tiff')));  
-save (char(strcat(result_dir,'/Mean_optimal_negativeLabel_network_.mat')),'BrainNet_negative_mean');
-save (char(strcat(result_dir,'/Mean_optimal_positiveLabel_network_.mat')),'BrainNet_positive_mean');
-
-function [opt_t,AUC,SEN,SPE,F1,Acc,plot_ROC,w,varargout]=cal_kfold_times(nSubj,kfoldout,All_Feat,meth_Net,label,lambda_lasso)
+function [opt_t,AUC,SEN,SPE,F1,Acc,plot_ROC,w,Youden,BalanceAccuracy,varargout]=cal_kfold_times(nSubj,kfoldout,All_Feat,meth_Net,label,lambda_lasso)
 cpred = zeros(nSubj,1);
 acc = zeros(nSubj,1);
 score = zeros(nSubj,1);
@@ -432,7 +459,7 @@ for fdout=1:c_out.NumTestSets
 end
 
 Acc=100*sum(cpred==label)/nSubj;
-[AUC,SEN,SPE,F1,plot_ROC]=perfeval_kfold(label,cpred,score);
+[AUC,SEN,SPE,F1,Youden,BalanceAccuracy,plot_ROC]=perfeval_kfold(label,cpred,score);
 switch meth_Net
     case {'SR','WSR','GSR','SLR','SGR','WSGR','SSGSR'}
         varargout{1}=feature_index_ttest;

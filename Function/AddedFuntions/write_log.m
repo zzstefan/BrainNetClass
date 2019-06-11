@@ -1,15 +1,22 @@
-function write_log(result_dir,meth_Net,cross_val,AUC,SEN,SPE,F1,Acc,varargin)
-% PC: Pearson's correlation
-% SR: Sparse representation
-% WSR: Weighted SR
-% SGR: Sparse group representation
-% WSGR: Weighted SGR
-% GSR: Group sparse represenation
-% SSGSR: Strength and similarity guided GSR
-% tHOFC: Topographical high-order FC
-% aHOFC: Associated high-order FC
-% dHOFC: Dynamic high-order FC
-%% Leave-one-out cross validation was performed on the 
+function write_log(result_dir,meth_Net,cross_val,AUC,SEN,SPE,F1,Acc,Youden,BalanceAccuracy,varargin)
+
+% This function records all the calculation details onto a logfile, including the method used to construct the brain network, the parameter range,
+% the function of each parameter, using LOOCV/10-fold to conduct the analysis, the suggested parameters, the occurrence frequency of each parameter
+% or parameter combination.
+% 
+% Input:
+% 	result_dir: the directory used to store all the results;
+% 	meth_Net: brain network construction method;
+% 	cross_val: loocv or 10-fold;
+% 	AUC, SEN, SPE,F1,Acc,Youden,BalanceAccuracy: model performance
+% 	varargin: according to different conditions, this could be the parameter range, lambda of lasso, etc.
+
+% Written by Zhen Zhou, zzstefan@email.unc.edu
+% IDEA lab, https://www.med.unc.edu/bric/ideagroup
+% Department of Radiology and BRIC, University of North Carolina at Chapel Hill
+% College of Computer Science, Zhejiang University, China
+
+fprintf('Saving the resluts.\n');
 fileName=char(strcat(result_dir,'/log.txt'));
 fp=fopen(fileName,'w');
 % fprintf(fp,'%%PC: Pearson''s correlation \r\n%%SR: Sparse representation \r\n%%WSR: Weighted SR \r\n');
@@ -31,8 +38,8 @@ switch meth_Net
         ktimes=varargin{4};
         opt_t=varargin{5};
         fprintf(fp,'%s method is used to constructed the brain network.\r\n\n',meth_Net);
-        fprintf(fp,'lambda ranges in %s.\r\n',num2str(lambda_1));
-        fprintf(fp,'lambda controls the sparsity.\r\n\n');
+        fprintf(fp,'Lambda ranges in %s.\r\n',num2str(lambda_1));
+        fprintf(fp,'Lambda controls the sparsity.\r\n\n');
         fprintf(fp,'Using connection coefficients as features and t-test (p<0.05) + LASSO (lambda=%0.2g) for feature selection.\r\n\n',lasso_lambda);
         if strcmpi(cross_val_method,'10-fold')
             fprintf(fp,'Using %s to calculate the final results.\r\n',cross_val_method);
@@ -51,8 +58,8 @@ switch meth_Net
         ktimes=varargin{4};
         opt_t=varargin{5};
         fprintf(fp,'%s method is used to constructed the brain network.\r\n\n',meth_Net);
-        fprintf(fp,'lambda ranges in %s.\r\n',num2str(lambda_1));
-        fprintf(fp,'lambda controls the group sparsity.\r\n\n');
+        fprintf(fp,'Lambda ranges in %s.\r\n',num2str(lambda_1));
+        fprintf(fp,'Lambda controls the group sparsity.\r\n\n');
         fprintf(fp,'Using connection coefficients as features and t-test (p<0.05) + LASSO(lambda=%0.2g) for feature selection.\r\n\n',lasso_lambda);
         if strcmpi(cross_val_method,'10-fold')
             fprintf(fp,'Using %s to calculate the final results.\r\n',cross_val_method);
@@ -71,9 +78,9 @@ switch meth_Net
         ktimes=varargin{5};
         opt_t=varargin{6};
         fprintf(fp,'%s method is used to constructed the brain network.\r\n\n',meth_Net);
-        fprintf(fp,'lambda 1 ranges in %s.\r\n',num2str(lambda_1));
-        fprintf(fp,'lambda 2 ranges in %s.\r\n',num2str(lambda_2));
-        fprintf(fp,'lambda 1 controls the sparsity and lambda 2 controls the group sparsity.\r\n\n');
+        fprintf(fp,'Lambda 1 ranges in %s.\r\n',num2str(lambda_1));
+        fprintf(fp,'Lambda 2 ranges in %s.\r\n',num2str(lambda_2));
+        fprintf(fp,'Lambda 1 controls the sparsity and lambda 2 controls the group sparsity.\r\n\n');
         fprintf(fp,'Using connection coefficients as features and ttest (p<0.05) + LASSO (lambda=%0.2g) for feature selection.\r\n\n',lasso_lambda);
         if strcmpi(cross_val_method,'10-fold')
             fprintf(fp,'Using %s to calculate the final results.\r\n',cross_val_method);
@@ -92,9 +99,9 @@ switch meth_Net
         ktimes=varargin{5};
         opt_t=varargin{6};
         fprintf(fp,'%s method is used to constructed the brain network.\r\n\n',meth_Net);
-        fprintf(fp,'lambda 1 ranges in %s.\r\n',num2str(lambda_1));
-        fprintf(fp,'lambda 2 ranges in %s.\r\n',num2str(lambda_2));
-        fprintf(fp,'lambda 1 controls the sparsity and lambda 2 controls the inter-group LOFC-pattern similarity.\r\n\n');
+        fprintf(fp,'Lambda 1 ranges in %s.\r\n',num2str(lambda_1));
+        fprintf(fp,'Lambda 2 ranges in %s.\r\n',num2str(lambda_2));
+        fprintf(fp,'Lambda 1 controls the sparsity and lambda 2 controls the inter-group LOFC-pattern similarity.\r\n\n');
         fprintf(fp,'Using connection coefficients as features and ttest (p<0.05) + LASSO (lambda=%0.2g) for feature selection.\r\n\n',lasso_lambda);
         if strcmpi(cross_val_method,'10-fold')
             fprintf(fp,'Using %s to calculate the final results.\r\n',cross_val_method);
@@ -113,9 +120,9 @@ switch meth_Net
         ktimes=varargin{5};
         opt_t=varargin{6};
         fprintf(fp,'%s method is used to constructed the brain network.\r\n\n',meth_Net);
-        fprintf(fp,'lambda 1 ranges in %s.\r\n',num2str(lambda_1));
-        fprintf(fp,'lambda 2 ranges in %s.\r\n',num2str(lambda_2));
-        fprintf(fp,'lambda 1 controls low rank and lambda 2 controls sparsity.\r\n\n');
+        fprintf(fp,'Lambda 1 ranges in %s.\r\n',num2str(lambda_1));
+        fprintf(fp,'Lambda 2 ranges in %s.\r\n',num2str(lambda_2));
+        fprintf(fp,'Lambda 1 controls low rank and lambda 2 controls sparsity.\r\n\n');
         fprintf(fp,'Using connection coefficients as features and ttest (p<0.05) + lasso (lambda=%0.2g) for feature selection.\r\n\n',lasso_lambda);
         if strcmpi(cross_val_method,'10-fold')
             fprintf(fp,'Using %s to calculate the final results.\r\n',cross_val_method);
@@ -135,9 +142,9 @@ switch meth_Net
         ktimes=varargin{6};
         opt_t=varargin{7};
         fprintf(fp,'%s method is used to constructed the brain network.\r\n\n',meth_Net);
-        fprintf(fp,'step length is %s. \r\n',num2str(step));
-        fprintf(fp,'cluster ranges in %s. \r\n',num2str(clusters));
-        fprintf(fp,'window_length ranges in %s. \r\n\n',num2str(window_length));
+        fprintf(fp,'Step size is %s. \r\n',num2str(step));
+        fprintf(fp,'Number of clusters ranges in %s. \r\n',num2str(clusters));
+        fprintf(fp,'Window length ranges in %s. \r\n\n',num2str(window_length));
         fprintf(fp,'Using local clustering coefficients as features and lasso(lambda=%0.2g) for feature selection.\r\n\n',lasso_lambda);
         if strcmpi(cross_val_method,'10-fold')
             fprintf(fp,'Using %s to calculate the final results.\r\n',cross_val_method);
@@ -162,9 +169,13 @@ switch meth_Net
         end
 end
 fprintf(fp,'\nModel evaluation result based on testing set:\r\n');
-fprintf(fp,'AUC:\t\t\t\t\t\t%0.4g\r\nACC:\t\t\t\t\t\t%3.2f%%\r\nSEN:\t\t\t\t\t\t%3.2f%%\r\nSPE:\t\t\t\t\t\t%3.2f%%\r\nF-score:\t\t\t\t\t\t%3.2f%%\r\n',AUC,Acc,SEN,SPE,F1);
+fprintf(fp,'AUC:\t\t\t\t\t\t%0.4g\r\nACC:\t\t\t\t\t\t%3.2f%%\r\nSEN:\t\t\t\t\t\t%3.2f%%\r\nSPE:\t\t\t\t\t\t%3.2f%%\r\nYouden:\t\t\t\t\t\t%3.2f%%\r\nF-score:\t\t\t\t\t\t%3.2f%%\r\nBAC:\t\t\t\t\t\t%3.2f%%\r\n',...
+    AUC,Acc,SEN,SPE,Youden,F1,BalanceAccuracy);
 
 fclose(fp);
+
+
+
 
 function [fe_method,fs_method]=trans(fe_method,fs_method,lasso_lambda)
 if strcmpi(fe_method,'coef')
@@ -194,7 +205,6 @@ name=string(length(All));
 switch meth_Net
     case {'SR','WSR','GSR'}
         lambda_1=varargin{1};
-        
         for i=1:length(All)
             opt_paramt(i)=lambda_1(All(i));
             name(i)=char(num2str(opt_paramt(i)));
@@ -210,8 +220,8 @@ switch meth_Net
         ax.XTickLabelRotation=45;
         xlabel('\lambda','Fontsize',13);
         ylabel('Frequency of occurrence (%)');
-        title(['Occurrence frequency of parameter(s)']);
-        print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/paprameter_occurrence.tiff')));
+        title('Occurrence frequency of selected parameter(s)');
+        print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/Model_robustness.tiff')));
     case {'SGR','WSGR','SLR','SSGSR'}
         lambda_1=varargin{1};
         lambda_2=varargin{2};
@@ -236,10 +246,10 @@ switch meth_Net
         set(gca,'XTick',ind_x,'XTicklabel',name);
         ax=gca;
         ax.XTickLabelRotation=45;
-        xlabel('\lambda_1 and \lambda_2','Fontsize',13);
+        xlabel('\lambda_1,\lambda_2','Fontsize',13);
         ylabel('Frequency of occurrence (%)');
-        title(['Occurrence frequency of parameter(s)']);
-        print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/paprameter_occurrence.tiff')));
+        title(['Occurrence frequency of selected parameter(s)']);
+        print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/Model_robustness.tiff')));
     case 'dHOFC'
         W=varargin{1};
         C=varargin{2};
@@ -247,11 +257,11 @@ switch meth_Net
         for i=1:length(All)
             which_C=ceil(All(i)/length(W));
             which_W=mod(All(i),length(W));
-            opt_paramt(i,1)=C(which_C);
+            opt_paramt(i,2)=C(which_C);
             if which_W==0
-                opt_paramt(i,2)=W(length(C));
+                opt_paramt(i,1)=W(length(W));
             else
-                opt_paramt(i,2)=W(which_W);
+                opt_paramt(i,1)=W(which_W);
             end
             name(i)=char(strcat(num2str(opt_paramt(i,1)),',',num2str(opt_paramt(i,2))));
         end
@@ -264,8 +274,8 @@ switch meth_Net
         set(gca,'XTick',ind_x,'XTicklabel',name);
         ax=gca;
         ax.XTickLabelRotation=45;
-        xlabel('Window length and number of clusters');
+        xlabel('Number of clusters,Window length');
         ylabel('Frequency of occurrence (%)');
-        title(['Occurrence frequency of parameter(s)']);
-        print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/paprameter_occurrence.tiff')));
+        title(['Occurrence frequency of selected parameter(s)']);
+        print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/Model_robustness.tiff')));
 end

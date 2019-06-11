@@ -1,7 +1,17 @@
 function []=ROC_kfold(plot_ROC,result_dir,k_fold)
-%% This is for drawing the ROC curve when performing the 10-fold cross validation 10 times.
-%% Combine the 10 ROC curves into one.
+% This is for drawing the ROC curve when performing the 10-fold cross validation 10 times.
+% Combine the 10 ROC curves into one.
 
+%Input:
+%   plot_ROC: middle results used to plot ROC curve, obtained from the
+%   perfeval function or perfeval_kfold function;
+%   result_dir: the directory used to store all the result data or figures;
+%   k_fold: number of 10-fold cross validation, default is 10;
+
+% Written by Zhen Zhou, zzstefan@email.unc.edu
+% IDEA lab, https://www.med.unc.edu/bric/ideagroup
+% Department of Radiology and BRIC, University of North Carolina at Chapel Hill
+% College of Computer Science, Zhejiang University, China
 fold_times=k_fold;
 for i=1:fold_times
     tmp(:,i)=plot_ROC{i}(:,1);
@@ -36,6 +46,6 @@ hold on
 plot(x_label,y_label,'k');
 xlabel('False Positive Rate');
 ylabel('True Positive Rate');
-title(['ROC curve of 10-fold']);
+title(['ROC curve (10-fold)']);
 axis square;
 print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/ROC.tiff')));

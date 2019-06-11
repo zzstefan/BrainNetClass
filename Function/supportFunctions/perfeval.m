@@ -1,9 +1,9 @@
-function [auc,SEN,SPE,F1,plot_ROC]=perfeval(Label,pred_Label,prob_Estimates,result_dir)
+function [auc,SEN,SPE,F1,Youden,BalanceAccuracy,plot_ROC]=perfeval(Label,pred_Label,prob_Estimates,result_dir)
 % Performance evaluation
 % 1: Patient (e.g., MCI), -1: Normal control (NC)
 % 
 
-save test.mat pred_Label prob_Estimates;
+%save test.mat pred_Label prob_Estimates;
 TP = sum(pred_Label==1 & Label == 1); % MCI --> MCI
 FP = sum(pred_Label==1 & Label == -1); % NC --> MCI
 TN = sum(pred_Label==-1 & Label == -1); % NC --> NC
@@ -31,7 +31,7 @@ set(gca,'XTick',[0:0.1:1]);
 axis square;
 xlabel('False Positive Rate');
 ylabel('True Positive Rate');
-title(['ROC curve of (AUC = ' num2str(auc) ' )']);
+title(['ROC curve (AUC = ' num2str(auc) ')']);
 
 print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/ROC.tiff')));
 
@@ -47,4 +47,5 @@ fprintf(1,'Testing set BAC: %3.2f%%\n',BalanceAccuracy*100);
 SEN=Sensitivity*100;
 SPE=Specificity*100;
 F1=Fscore*100;
-
+Youden=Youden*100;
+BalanceAccuracy=BalanceAccuracy*100;

@@ -1,17 +1,29 @@
-% This is a demo including the whole framework of brain network-based
-% classification, including network construction (different algorithms to
-% choose), feature extraction (connectivity strength or graph theoretical 
-% analysis-based local clustering coefficient), feature selection (ttest2 
-% or lasso) and classification (LOOCV-based performance evaluation). 
-% This demo does not include any model parameter optimization, if you have 
-% parameter to be optimized, please refer to another demo "demo_param_select.m".
-%
-% Created by Yu Zhang, 7/26/2017 zhangyu0112@gmail.com
-% Modified by Han Zhang, 8/2/2017 hanzhang@med.unc.edu
+function [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,varargout]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label)
+% This function is for classification problem that has no parameter(s) to
+% optimize.  Note that this function uses the LOOCV.
+
+
+% Input:
+%     result_dir: the directory you want to store all the results in;
+%     meth_Net: the brain network construction method;
+%     meth_FEX: feature extraction method(connection coefficients or local clustering coefficients)
+%     meth_FS: feature selection method (ttest,lasso,ttest+lasso);
+%     BOLD: time courses extracted using a template;
+%     label: the label for each subject; e.g., -1 for normal controls and 1 for patients;
+%     
+%     
+% Output:
+%     AUC,SEN,SPE,F1,Acc,Youden,BalanceAccuracy: model performance;
+%     w: weight of each selected features@email.unc.edu
+%     varargout: the feature selection index for the following finding features section.
+
+% Written by Zhen Zhou, zzstefan@email.unc.edu
 % IDEA lab, https://www.med.unc.edu/bric/ideagroup
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
+% College of Computer Science, Zhejiang University, China
 
-function [AUC,SEN,SPE,F1,Acc,w,varargout]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label)
+
+
 %clc; clear; close all;
 
 % root=cd;
@@ -151,7 +163,7 @@ for i=1:nSubj
     [cpred(i,1),acc,score(i,1)]=svmpredict(label(i),teFe,classmodel,'-q');
 end
 Acc=100*sum(cpred==label)/nSubj;
-[AUC,SEN,SPE,F1,~]=perfeval(label,cpred,score,result_dir);
+[AUC,SEN,SPE,F1,Youden,BalanceAccuracy,~]=perfeval(label,cpred,score,result_dir);
 fprintf('End calculation process\n');
 
 switch meth_FS
@@ -163,33 +175,9 @@ switch meth_FS
         varargout{1}=feature_index_ttest;
         varargout{2}=feature_index_lasso;
 end
+save_optimal_network(meth_Net,BrainNet,label,result_dir);
 
-opt_BrainNet=BrainNet;
-label_negative=find(label==-1);
-label_positive=find(label==1);
-BrainNet_negative_mean=mean(opt_BrainNet(:,:,label_negative),3);
-BrainNet_positive_mean=mean(opt_BrainNet(:,:,label_positive),3);
+lambda_lasso=0.1;
+save_model(BrainNet,meth_Net,label,result_dir,meth_FEX,meth_FS,lambda_lasso);
 
-%figure;
-figure('visible','off');
-subplot(1,2,1);
-imagesc(BrainNet_positive_mean);
-colormap jet
-colorbar
-axis square
-xlabel('ROI');
-ylabel('ROI');
-title('label = -1');
-
-subplot(1,2,2);
-imagesc(BrainNet_negative_mean);
-colormap jet
-colorbar
-axis square
-xlabel('ROI');
-ylabel('ROI');
-title('label = 1');
-print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/Mean_optimal_network.tiff')));  
-save (char(strcat(result_dir,'/Mean_optimal_negativeLabel_network_.mat')),'BrainNet_negative_mean');
-save (char(strcat(result_dir,'/Mean_optimal_positiveLabel_network_.mat')),'BrainNet_positive_mean');
 

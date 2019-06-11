@@ -1,0 +1,26 @@
+dHOFC method is used to constructed the brain network.
+
+Step size is 1. 
+Number of clusters ranges in 100  200  300. 
+Window length ranges in 20  30. 
+
+Using local clustering coefficients as features and lasso(lambda=0.1) for feature selection.
+
+Using leave-one-out cross validation to calculate the final results.
+The suggested parameter(s): 20  200. 
+
+The occurrence of hyper-parameter(s):
+20,100 							 20%
+30,100 							 10%
+20,200 							 55%
+20,300 							 5%
+30,300 							 10%
+
+Model evaluation result based on testing set:
+AUC:						0.45
+ACC:						40.00%
+SEN:						40.00%
+SPE:						40.00%
+Youden:						-20.00%
+F-score:						40.00%
+BAC:						40.00%

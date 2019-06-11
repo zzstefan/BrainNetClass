@@ -19,8 +19,8 @@ function [BrainNet]=WSGR(BOLD,lambda1,lambda2)
 % Cite: 1. Renping Yu, Han Zhang, et al. Correlation-Weighted Sparse Group 
 %          Representation for Brain Network Construction in MCI Classification,
 %          MICCAI 2016.
-%       2. Renping Yu, Han Zhang, et al. Connectivity strengthÂ©\weighted sparse
-%          group representationÂ©\based brain network construction for MCI 
+%       2. Renping Yu, Han Zhang, et al. Connectivity strength©\weighted sparse
+%          group representation©\based brain network construction for MCI 
 %          classification, Human Brain Mapping, 2017.
 % 
 

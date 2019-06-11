@@ -1,7 +1,10 @@
 function BrainNet=SGR(BOLD,lambda1,lambda2)
+% lambda1=0.01;
+% lambda2=0.02
+
 % FC Network Construction using Sparse Group Representation (SGR)
 % 
-% Inpute:
+% Input:
 % BOLD. A cell array with size of N x 1, each cell is a matrix of BOLD signals (#time points x #ROIs) from one of N subject
 %       Each subject may have different #time points but should have the same #ROIs
 % lambda1. parameter for sparsity
@@ -54,14 +57,14 @@ for SubjectID=1:nSubj
     ind=zeros(3,Bins);
     %% Correlation
     Total_Data=zeros(TimePoint,RegionNum);
-    Group=zeros((RegionNum-1)*RegionNum,2);
-    R=zeros(RegionNum-1,RegionNum);
-    TIndex=zeros(RegionNum-1,RegionNum);
+    Group=zeros((RegionNum-1)*RegionNum,2,'single');
+    R=zeros(RegionNum-1,RegionNum,'single');
+    TIndex=zeros(RegionNum-1,RegionNum,'single');
     tmp=BOLD{SubjectID};
     subject=tmp(:,1:RegionNum);
     [r,~]=corrcoef(subject);
     for j=1:RegionNum
-        Index=1:RegionNum;
+        Index=single(1:RegionNum);
         Index(j)=[];
         TIndex(:,j)=Index;
         R(:,j)=r(Index,j);
@@ -110,10 +113,13 @@ for SubjectID=1:nSubj
     opts.ind=ind;
     %% Network learning based on group sparse lasso
     z=[lambda1,lambda2];
-    brainnet=zeros(RegionNum-1,RegionNum);
-    Brainnet=zeros(RegionNum,RegionNum);
     A=sparse(Dictionary);
+    clear Dictionary;
+    brainnet=zeros(RegionNum-1,RegionNum,'single');
+    Brainnet=zeros(RegionNum,RegionNum,'single');
+    
     [x, ~, ~]= sgLeastR(A, Response, z, opts);
+    
     for kk=1:length(x)
         brainnet(Group(kk,1),Group(kk,2))=x(kk);
     end

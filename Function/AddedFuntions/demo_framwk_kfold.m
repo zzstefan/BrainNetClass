@@ -1,35 +1,25 @@
-% This is a demo including the whole framework of brain network-based
-% classification, including network construction (different algorithms to
-% choose), feature extraction (connectivity strength or graph theoretical 
-% analysis-based local clustering coefficient), feature selection (ttest2 
-% or lasso) and classification (LOOCV-based performance evaluation). 
-% This demo does not include any model parameter optimization, if you have 
-% parameter to be optimized, please refer to another demo "demo_param_select.m".
-%
-% Created by Yu Zhang, 7/26/2017 zhangyu0112@gmail.com
-% Modified by Han Zhang, 8/2/2017 hanzhang@med.unc.edu
+function [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,varargout]=demo_framwk_kfold(k_fold,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label)
+% This function is for classification problem that has no parameter(s) to
+% optimize.  Note that this function uses the 10-fold.
+
+% Input:
+%     result_dir: the directory you want to store all the results in;
+%     meth_Net: the brain network construction method;
+%     meth_FEX: feature extraction method(connection coefficients or local clustering coefficients)
+%     meth_FS: feature selection method (ttest,lasso,ttest+lasso);
+%     BOLD: time courses extracted using a template;
+%     label: the label for each subject; e.g., -1 for normal controls and 1 for patients;
+%     
+%     
+% Output:
+%     AUC,SEN,SPE,F1,Acc,Youden,BalanceAccuracy: model performance;
+%     w: weight of each selected features@email.unc.edu
+%     varargout: the feature selection index for the following finding features section.
+
+% Written by Zhen Zhou, zzstefan@email.unc.edu
 % IDEA lab, https://www.med.unc.edu/bric/ideagroup
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
-
-function [AUC,SEN,SPE,F1,Acc,w,varargout]=demo_framwk_kfold(k_fold,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label)
-%clc; clear; close all;
-
-% root=cd;
-% addpath(genpath([root '/Function']));
-% addpath(genpath([root '/Toolbox']));
-
-
-%% Load BOLD signals
-% load('demo_param_select_toydata.mat');    % This is just an example data including 10 subjects only
-%                         % You can replace this by your larger dataset
-%                         % BOLD: A cell array, each matrix includes BOLD signals (137 volumes x 116 ROIs) of one subject 
-%                         % label: class labels, 1 for MCI and -1 for NC
-% BOLD = cell(size(data,1),1);
-% label = zeros(size(data,1),1);
-% for i=1:size(data,1)
-%     BOLD{i,1} = data{i,1};
-%     label(i,1) = data{i,2};
-% end
+% College of Computer Science, Zhejiang University, China
                       
 [~,nROI]=size(BOLD{1});
 nSubj=length(BOLD);
@@ -97,13 +87,14 @@ kfoldout=10;
 fprintf('Begin calculation process\n');
 rng('shuffle');
 for i=1:fold_times
+    fprintf(1,'Begin 10-fold cross-validation time %d...\n',i);
     switch meth_FS
         case 't-test'
-            [AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),feature_index_ttest(i,:)]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS);
+            [AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),Youden(i),BalanceAccuracy(i),feature_index_ttest(i,:)]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS);
         case 'LASSO'
-            [AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),feature_index_lasso(i,:)]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS);
+            [AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),Youden(i),BalanceAccuracy(i),feature_index_lasso(i,:)]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS);
         case 't-test + LASSO'
-            [AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),feature_index_ttest(i,:),feature_index_lasso(i,:)]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS);
+            [AUC(i),SEN(i),SPE(i),F1(i),Acc(i),plot_ROC{i},w(i,:),Youden(i),BalanceAccuracy(i),feature_index_ttest(i,:),feature_index_lasso(i,:)]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS);
     end       
 end
 rng('default');
@@ -112,7 +103,16 @@ SEN=mean(SEN);
 SPE=mean(SPE);
 F1=mean(F1);
 Acc=mean(Acc);
+Youden=mean(Youden);
+BalanceAccuracy=mean(BalanceAccuracy);
 ROC_kfold(plot_ROC,result_dir,fold_times);
+fprintf('Testing set AUC: %g\n',AUC);
+fprintf(1,'Testing set Sens: %3.2f%%\n',SEN);
+fprintf(1,'Testing set Spec: %3.2f%%\n',SPE);
+fprintf(1,'Testing set Youden: %3.2f%%\n',Youden);
+fprintf(1,'Testing set F-score: %3.2f%%\n',F1);
+fprintf(1,'Testing set BAC: %3.2f%%\n',BalanceAccuracy);
+
 fprintf('End calculation process\n');
 
 switch meth_FS
@@ -124,38 +124,10 @@ switch meth_FS
         varargout{1}=feature_index_ttest;
         varargout{2}=feature_index_lasso;
 end
+save_optimal_network(meth_Net,BrainNet,label,result_dir);
+save_model(BrainNet,meth_Net,label,result_dir,meth_FEX,meth_FS,lambda_lasso);
 
-opt_BrainNet=BrainNet;
-label_negative=find(label==-1);
-label_positive=find(label==1);
-BrainNet_negative_mean=mean(opt_BrainNet(:,:,label_negative),3);
-BrainNet_positive_mean=mean(opt_BrainNet(:,:,label_positive),3);
-
-%figure;
-figure('visible','off');
-subplot(1,2,1);
-imagesc(BrainNet_positive_mean);
-colormap jet
-colorbar
-axis square
-xlabel('ROI');
-ylabel('ROI');
-title('label = -1');
-
-subplot(1,2,2);
-imagesc(BrainNet_negative_mean);
-colormap jet
-colorbar
-axis square
-xlabel('ROI');
-ylabel('ROI');
-title('label = 1');
-print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/Mean_optimal_network.tiff')));  
-save (char(strcat(result_dir,'/Mean_optimal_negativeLabel_network_.mat')),'BrainNet_negative_mean');
-save (char(strcat(result_dir,'/Mean_optimal_positiveLabel_network_.mat')),'BrainNet_positive_mean');    
-
-
-function [AUC,SEN,SPE,F1,Acc,plot_ROC,w,varargout]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS)
+function [AUC,SEN,SPE,F1,Acc,plot_ROC,w,Youden,BalanceAccuracy,varargout]=cal_kfold_times(nSubj,kfoldout,Feat,meth_Net,label,meth_FS)
 c_out = cvpartition(nSubj,'k', kfoldout);
 cpred=zeros(nSubj,1);
 score=zeros(nSubj,1);
@@ -212,7 +184,7 @@ for fdout=1:c_out.NumTestSets
     [cpred(test(c_out,fdout)),~,score(test(c_out,fdout))]=svmpredict(Test_lab,Test_data,classmodel,'-q');
 end
 Acc=100*sum(cpred==label)/nSubj;
-[AUC,SEN,SPE,F1,plot_ROC]=perfeval_kfold(label,cpred,score);
+[AUC,SEN,SPE,F1,Youden,BalanceAccuracy,plot_ROC]=perfeval_kfold(label,cpred,score);
 
 switch meth_FS
     case 't-test'

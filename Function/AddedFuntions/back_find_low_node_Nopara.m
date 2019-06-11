@@ -1,7 +1,30 @@
-%%find SR-based brain network construction method features
 function [result_features]=back_find_low_node_Nopara(result_dir,nSubj,k_times,nROI,w,cross_val,meth_FEX,meth_FS,varargin)
-% 
- %clear all
+% This function aims to find features used in the classification, suitable
+% for the PC,aHOFC,tHOFC brain network construction method. And also
+% suitable for the LOOCV or the 10-fold cross validation. The finding
+% features can be applied on the visualization software to present the
+% important brain regios.
+% Input:
+%         result_dir: the directory you want to store all the result files;
+%         nSubj: number of subjects;
+%         k_times: times of 10-fold cross validation;
+%         nROI: number of ROIs 
+%         w: weight of each selected features;
+%         cross_val: loocv or 10-fold;
+%         meth_FEX: feature extraction method(connection coefficients or local clustering coefficients);
+%         meth_FS: feature selection method (ttest,lasso,ttest+lasso);
+%         varargin: the feature selection indexes;
+%         
+% Output:
+%        result_features: cell array, consisting of the averaged weight and occurrence of the features;
+% Written by Zhen Zhou, zzstefan@email.unc.edu
+% IDEA lab, https://www.med.unc.edu/bric/ideagroup
+% Department of Radiology and BRIC, University of North Carolina at Chapel Hill
+% College of Computer Science, Zhejiang University, China
+
+
+
+%clear all
 % load SR_10_fold_middle.mat;
 % load SR_loocv_middle.mat;
 % cross_val='loocv';

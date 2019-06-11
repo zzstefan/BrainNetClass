@@ -1,28 +1,13 @@
 function varargout = BrainNetClass(varargin)
-% TEST MATLAB code for test.fig
-%      TEST, by itself, creates a new TEST or raises the existing
-%      singleton*.
-%
-%      H = TEST returns the handle to a new TEST or the handle to
-%      the existing singleton*.
-%
-%      TEST('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in TEST.M with the given input arguments.
-%
-%      TEST('Property','Value',...) creates a new TEST or raises the
-%      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before test_OpeningFcn gets called.  An
-%      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to test_OpeningFcn via varargin.
-%
-%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
-%      instance to run (singleton)".
-%
-% See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help test
-
-% Last Modified by GUIDE v2.5 23-May-2019 15:30:06
+%BrainNet construction and classification toolbox (BrainNetClass) GUI by Zhen Zhou
+%  Copyright(c) 2019; GNU GENERAL PUBLIC LICENSE
+%  Image Display, Enhancement, and Analysis (IDEA) Group
+%  Department of Radiology and Biomedical Research Imaging Center,
+%  University of North Carolina, Chapel Hill, NC 27599, USA
+%  College of Computer Science, Zhejiang University, Hangzhou, China.
+%  Written by Zhen Zhou, Han Zhang
+%  zzstefan@email.unc.edu, hanzhang@med.unc.edu
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -53,7 +38,25 @@ function BrainNetClass_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to test (see VARARGIN)
 
 % Choose default command line output for test
-handles.output = hObject;
+
+Release='V1.0';
+%handles.Release = Release; % Will be used in mat file version checking (e.g., in function SetLoadedData)
+
+if ispc
+    UserName =getenv('USERNAME');
+else
+    UserName =getenv('USER');
+end
+Datetime=fix(clock);
+fprintf('Welcome: %s, %.4d-%.2d-%.2d %.2d:%.2d \n', UserName,Datetime(1),Datetime(2),Datetime(3),Datetime(4),Datetime(5));
+fprintf('BrainNet construction and classification toolbox (BrainNetClass) GUI. \nRelease = %s\n',Release);
+fprintf('Copyright(c) 2009; GNU GENERAL PUBLIC LICENSE\n');
+fprintf('Image Display, Enhancement, and Analysis (IDEA) Group, Department of Radiology and Biomedical Research Imaging Center, University of North Carolina, Chapel Hill, NC 27599, USA;\n');
+fprintf('College of Computer Science, Zhejiang University, Hangzhou, China.\n');
+fprintf('Mail to Author:  <a href="zzstefan@email.unc.edu">Zhen Zhou</a>');
+fprintf('\n-----------------------------------------------------------\n');
+fprintf('Citing Information:\nIf you think BrainNetClass is useful for your work, please citing the paper: \n');
+
 
 BrainNetClassPath=fileparts(which('BrainNetClass.m'));
 
@@ -101,15 +104,15 @@ set(handles.window_length,'Enable','off');
 %set(handles.lasso_lambda,'Enable','off');
 set(handles.sensitivity_test,'Enable','off');
 
-handles.default.lambda_1=[0.01:0.01:0.05];
-handles.default.lambda_2=[0.01:0.01:0.05];
-handles.default.clusters=[100:100:300];
-handles.default.window_length=[50:10:80];
+% handles.default.lambda_1=[0.01:0.01:0.05];
+% handles.default.lambda_2=[0.01:0.01:0.05];
+% handles.default.clusters=[100:100:300];
+% handles.default.window_length=[20:10:40];
 
-% handles.default.lambda_1=[0.01:0.01:0.1];
-% handles.default.lambda_2=[0.01:0.01:0.1];
-% handles.default.clusters=[100:100:800];
-% handles.default.window_length=[50:10:120];
+handles.default.lambda_1=[0.01:0.01:0.1];
+handles.default.lambda_2=[0.01:0.01:0.1];
+handles.default.clusters=[100:100:800];
+handles.default.window_length=[20:10:60];
 handles.default.k_times=10;
 
 % User can change the value of lasso_lambda and step 
@@ -174,6 +177,24 @@ handles.meth_Net='PC';
 % uicontrol('Style','text','Fontname','Calibri','String',sprintf('    \x3bb lasso for \n feature selection'),'units','characters','Position',p);
 
 % Update handles structure
+if ~ispc
+    if ismac
+        ZoomFactor=0.95;  %For Mac
+    else
+        ZoomFactor=0.8;  %For Linux
+    end
+    ObjectNames = fieldnames(handles);
+    for i=1:length(ObjectNames);
+        eval(['IsFontSizeProp=isprop(handles.',ObjectNames{i},',''FontSize'');']);
+        if IsFontSizeProp
+            eval(['PCFontSize=get(handles.',ObjectNames{i},',''FontSize'');']);
+            FontSize=PCFontSize*ZoomFactor;
+            eval(['set(handles.',ObjectNames{i},',''FontSize'',',num2str(FontSize),');']);
+        end
+    end
+end
+    
+handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes test wait for user response (see UIRESUME)
@@ -213,8 +234,9 @@ meth_Type=popStrings_net{get(hObject,'Value')};
 No_parameter={'PC','tHOFC','aHOFC'};
 Parameter_needed={'SR','WSR','SGR','WSGR','GSR','SSGSR','SLR','dHOFC'};
 if strcmpi(meth_Type,'Network Type I:  No Parameter Required')
-    set(handles.method_choice, 'value', 1);
+    
     set(handles.method_choice,'String',No_parameter);
+    set(handles.method_choice, 'value', 1);
     set(handles.lambda1,'Enable','off');
     set(handles.lambda2,'Enable','off');
     %set(handles.lasso_lambda,'Enable','off');
@@ -226,10 +248,18 @@ if strcmpi(meth_Type,'Network Type I:  No Parameter Required')
     set(handles.fs_method,'Enable','on');
     set(handles.fe_method,'Value',1);
     set(handles.fs_method,'Value',1);
+    meth_Net='PC';
+    handles.meth_Net=meth_Net;
     set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf(''));
     set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf(''));
     set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf(''));
 elseif strcmpi(meth_Type,'Network Type II: Parameter Required')
+    if isfield(handles,'pop_choice_fe')
+        handles=rmfield(handles,'pop_choice_fe');
+    end
+    if isfield(handles,'pop_choice_fs')
+        handles=rmfield(handles,'pop_choice_fs');
+    end
     set(handles.fs_method,'Value',4);
     set(handles.fe_method,'Value',2);
     set(handles.fe_method,'Enable','off');
@@ -241,11 +271,7 @@ elseif strcmpi(meth_Type,'Network Type II: Parameter Required')
     set(handles.sensitivity_test,'Enable','on');
     meth_Net='SR';
     handles.meth_Net=meth_Net;
-<<<<<<< HEAD
     set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Lambda controls sparsity'));
-=======
-    set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('\x3bb controlling sparsity'));
->>>>>>> 64dabd9a46900261ae393ab1f8ccd619b0838903
     set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Connection coefficients as features'));
     set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('t-test (p<0.05) + LASSO for feature selection'));
     %guidata(hObject,handles);
@@ -295,6 +321,9 @@ pop_choice_fe=contents_fe{get(hObject,'Value')};
 switch pop_choice_fe
     case 'Feature Extraction Method'
         set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','string',sprintf(''));
+        if isfield(handles,'pop_choice_fe')
+        handles=rmfield(handles,'pop_choice_fe');
+        end
     case 'Connection coefficients'
         tmp='coef';
         %handles.fe_method=tmp;
@@ -341,7 +370,9 @@ handles.pop_choice_fs=pop_choice_fs;
 guidata(hObject,handles);
 if strcmpi(pop_choice_fs,'Feature Selection Method')
     set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','string',sprintf(''));
-
+    if isfield(handles,'pop_choice_fe')
+        handles=rmfield(handles,'pop_choice_fe');
+    end
 elseif isfield(handles,'fs_method')
     set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',...
         sprintf('%s for feature selection',pop_choice_fs));
@@ -425,7 +456,7 @@ switch meth_Net
     case 'dHOFC'
         set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Step normally set to 1'));
         set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('Local clustering coefficients as features'));
-        set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('LASSO for feature selection'));
+        set(handles.fs_details,'HorizontalAlignment','left','Fontname','Calibri','ForegroundColor',[0.3 0.75 0.93],'string',sprintf('LASSO for feature selection'));
 end
 
 if strcmp(meth_Net,'SR')||strcmp(meth_Net,'WSR')||strcmp(meth_Net,'GSR')
@@ -498,7 +529,7 @@ sign_FS=isfield(handles,'pop_choice_fs');
 switch handles.meth_Type
     case 'Network Type I:  No Parameter Required'
        sign_all_char={'input data','output directory','label','feature extraction method','feature selection method'};
-        sign_all_char=cellstr(sign_all_char);
+       sign_all_char=string(sign_all_char);
         
         sign_all=[sign_input,sign_output,sign_label,sign_FEX,sign_FS];
         if sum(sign_all)<5
@@ -514,13 +545,14 @@ switch handles.meth_Type
                 end
                 i=i+1;
             end
-            error(temp);
+            uiwait(msgbox(temp,'Warning','modal'));
+            return;
         end
     case 'Network Type II: Parameter Required'
-        sign_all_char={'input data','output directory','label','parameter sensitivity test'};
-        sign_all_char=cellstr(sign_all_char);
-        sign_all=[sign_input,sign_output,sign_label,handles.sensitivity_test.Value];
-        if sum(sign_all)<4
+        sign_all_char={'input data','output directory','label'};
+        sign_all_char=string(sign_all_char);
+        sign_all=[sign_input,sign_output,sign_label];
+        if sum(sign_all)<3
             index=find(sign_all==0);
             temp='You need to specify: ';
             missing_inputs=length(index);
@@ -533,7 +565,8 @@ switch handles.meth_Type
                 end
                 i=i+1;
             end
-            error(temp);
+            uiwait(msgbox(temp,'Warning','modal'));
+            return;
         end
 end
 
@@ -562,29 +595,29 @@ if strcmpi(handles.meth_Type,'Network Type I:  No Parameter Required')
     if strcmpi(handles.cross_val,'loocv')
         switch meth_FS
             case 't-test'
-                [AUC,SEN,SPE,F1,Acc,w,feature_index_ttest]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest);
             case 'LASSO'
-                [AUC,SEN,SPE,F1,Acc,w,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_lasso);
             case 't-test + LASSO'
-                [AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest,feature_index_lasso);
         end
     elseif strcmpi(handles.cross_val,'10-fold')
         switch meth_FS
             case 't-test'
-                [AUC,SEN,SPE,F1,Acc,w,feature_index_ttest]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest);
             case 'LASSO'
-                [AUC,SEN,SPE,F1,Acc,w,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_lasso);
             case 't-test + LASSO'
-                [AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label);
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest,feature_index_lasso);
         end
     end
-        write_log(result_dir,meth_Net,handles.cross_val,AUC,SEN,SPE,F1,Acc,meth_FEX,meth_FS,handles.default.k_times,handles.default.lasso_lambda);
+        write_log(result_dir,meth_Net,handles.cross_val,AUC,SEN,SPE,F1,Acc,Youden,BalanceAccuracy,meth_FEX,meth_FS,handles.default.k_times,handles.default.lasso_lambda);
 else
 
     meth_Net=handles.meth_Net;
@@ -597,11 +630,11 @@ else
             memory_needed=sum(nSubj*4*length(handles.default.window_length)*(handles.default.clusters.*handles.default.clusters))/(1024*1024*1024);
     end
     msg=sprintf('The whole program needs at least %3.4f GB memory to run.',memory_needed);
-    answer=questdlg({msg,'If your the RAM of your computer is not enough,','you may change to another computer with larger RAM','or switch to the no-parameter required construction method!'},...
+    answer=questdlg({msg,'If the physical memory of your computer is not enough,','you may change to another PC or server/cluster with larger RAM','or switch to a method that does not need parameter tuning.'},...
         'Warning','Continue','Stop','Continue');
     switch answer
         case 'Continue'
-            return;
+            
         case 'Stop'
             error('Stop by user.');
     end
@@ -610,20 +643,20 @@ else
     if strcmpi(handles.cross_val,'loocv')
         switch meth_Net
             case {'SR','WSR','GSR'}
-                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lasso_lambda);
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lasso_lambda);
             case {'SLR','SGR','WSGR','SSGSR'}
-                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lambda_2,handles.default.lasso_lambda);
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lambda_2,handles.default.lasso_lambda);
             case 'dHOFC'
-                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_lasso,IDX]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.window_length,handles.default.step,handles.default.clusters,handles.default.lasso_lambda);
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso,IDX]=param_select(result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.window_length,handles.default.step,handles.default.clusters,handles.default.lasso_lambda);
         end
     elseif strcmpi(handles.cross_val,'10-fold')
         switch meth_Net
             case {'SR','WSR','GSR'}
-                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lasso_lambda);
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lasso_lambda);
             case {'SLR','SGR','WSGR','SSGSR'}
-                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_ttest,feature_index_lasso]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lambda_2,handles.default.lasso_lambda);
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lambda_2,handles.default.lasso_lambda);
             case 'dHOFC'
-                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,feature_index_lasso,IDX]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.window_length,handles.default.step,handles.default.clusters,handles.default.lasso_lambda);
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso,IDX]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.window_length,handles.default.step,handles.default.clusters,handles.default.lasso_lambda);
         end
     end
     
@@ -631,13 +664,13 @@ else
     switch meth_Net
         case {'SR','WSR','GSR'}
             [result_features]=back_find_low_node_para(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,feature_index_ttest,feature_index_lasso);
-            write_log(result_dir,meth_Net,handles.cross_val,AUC,SEN,SPE,F1,Acc,handles.default.lambda_1,handles.default.lasso_lambda,opt_paramt,handles.default.k_times,opt_t);
+            write_log(result_dir,meth_Net,handles.cross_val,AUC,SEN,SPE,F1,Acc,Youden,BalanceAccuracy,handles.default.lambda_1,handles.default.lasso_lambda,opt_paramt,handles.default.k_times,opt_t);
         case {'SGR','WSGR','SSGSR','SLR'}
             [result_features]=back_find_low_node_para(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,feature_index_ttest,feature_index_lasso);
-            write_log(result_dir,meth_Net,handles.cross_val,AUC,SEN,SPE,F1,Acc,handles.default.lambda_1,handles.default.lambda_2,handles.default.lasso_lambda,opt_paramt,handles.default.k_times,opt_t);
+            write_log(result_dir,meth_Net,handles.cross_val,AUC,SEN,SPE,F1,Acc,Youden,BalanceAccuracy,handles.default.lambda_1,handles.default.lambda_2,handles.default.lasso_lambda,opt_paramt,handles.default.k_times,opt_t);
         case 'dHOFC'
             [result_features]=back_find_high_node(handles.default.window_length,handles.default.clusters,nROI,w,feature_index_lasso,IDX,opt_t);
-            write_log(result_dir,meth_Net,handles.cross_val,AUC,SEN,SPE,F1,Acc,handles.default.window_length,handles.default.step,handles.default.clusters,handles.default.lasso_lambda,opt_paramt,handles.default.k_times,opt_t);
+            write_log(result_dir,meth_Net,handles.cross_val,AUC,SEN,SPE,F1,Acc,Youden,BalanceAccuracy,handles.default.window_length,handles.default.step,handles.default.clusters,handles.default.lasso_lambda,opt_paramt,handles.default.k_times,opt_t);
     end
     set(handles.parameter,'string',opt_paramt);
 end
@@ -645,11 +678,8 @@ end
 save (char(strcat(result_dir,'/result_features.mat')),'result_features');
 set(handles.Result_details,'HorizontalAlignment','left','Fontname','Calibri','FontSize',10,...
     'string',sprintf('AUC: %0.4g\nACC: %3.2f%%\nSEN: %3.2f%%\nSPE: %3.2f%%\nF-score: %3.2f%%',AUC,Acc,SEN,SPE,F1));
-<<<<<<< HEAD
+
 uiwait(msgbox('Classification Completed.','modal'));
-=======
-uiwait(msgbox('Operation all finished!','modal'));
->>>>>>> 64dabd9a46900261ae393ab1f8ccd619b0838903
 % --- Executes on button press in select_dir.
 
 function select_dir_Callback(hObject, eventdata, handles)
@@ -675,7 +705,7 @@ set(handles.data_dir,'string',folderName);
 % end
 % handles.file_extension=file_extension;
 
-
+% 
 dirOutput=dir(fullfile(folderName,'*.txt'));
 fileName={dirOutput.name}';
 %folder={dirOutput.folder}';
@@ -745,16 +775,17 @@ function select_label_Callback(hObject, eventdata, handles)
 % hObject    handle to select_label (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+% % 
 % if handles.file_extension ==1
-%     label_fileName=uigetfile('.mat','please select the label file');
+%     [label_fileName,path]=uigetfile('.mat','please select the label file');
 % else 
-%     label_fileName=uigetfile('.txt','please select the label file');
+%     [label_fileName,path]=uigetfile('.txt','please select the label file');
 % end
 
-label_fileName=uigetfile('.txt','please select the label file');
+  [label_fileName,path]=uigetfile('.txt','please select the label file');
 
-label=importdata(label_fileName);
+label=importdata(fullfile(path,label_fileName));
+
 set(handles.label_file,'string',label_fileName);
 
 handles.label=label;
@@ -1027,19 +1058,19 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-function reset_para(handles)
-    set(handles.window_length,'Enable','off');
-    %set(handles.step,'Enable','off');
-    set(handles.clusters,'Enable','off');
-    set(handles.lambda1,'Enable','off');
-    %set(handles.lasso_lambda,'Enable','off');
-    set(handles.lambda2,'Enable','off');
-    set(handles.sensitivity_test,'Enable','off');
-    set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','string',sprintf(''));
-    set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','string',sprintf(''));
-    set(handles.fe_method,'Enable','on');
-    set(handles.fs_method,'Enable','on');
-    set(handles.fe_method,'Value',1);
-    set(handles.fs_method,'Value',1);
+% function reset_para(handles)
+%     set(handles.window_length,'Enable','off');
+%     %set(handles.step,'Enable','off');
+%     set(handles.clusters,'Enable','off');
+%     set(handles.lambda1,'Enable','off');
+%     %set(handles.lasso_lambda,'Enable','off');
+%     set(handles.lambda2,'Enable','off');
+%     set(handles.sensitivity_test,'Enable','off');
+%     set(handles.lambda_details,'HorizontalAlignment','left','Fontname','Calibri','string',sprintf(''));
+%     set(handles.fe_details,'HorizontalAlignment','left','Fontname','Calibri','string',sprintf(''));
+%     set(handles.fe_method,'Enable','on');
+%     set(handles.fs_method,'Enable','on');
+%     set(handles.fe_method,'Value',1);
+%     set(handles.fs_method,'Value',1);
 
     

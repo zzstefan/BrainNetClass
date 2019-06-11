@@ -1,4 +1,4 @@
-function [auc,SEN,SPE,F1,plot_ROC]=perfeval_kfold(Label,pred_Label,prob_Estimates)
+function [auc,SEN,SPE,F1,Youden,BalanceAccuracy,plot_ROC]=perfeval_kfold(Label,pred_Label,prob_Estimates)
 % Performance evaluation
 % 1: Patient (e.g., MCI), -1: Normal control (NC)
 % 
@@ -25,4 +25,5 @@ plot_ROC=[stack_x,stack_y];
 SEN=Sensitivity*100;
 SPE=Specificity*100;
 F1=Fscore*100;
-
+Youden=Youden*100;
+BalanceAccuracy=BalanceAccuracy*100;

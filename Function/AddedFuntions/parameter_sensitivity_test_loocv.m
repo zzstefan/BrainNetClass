@@ -1,10 +1,19 @@
 function [Acc]=parameter_sensitivity_test_loocv(All_Feat,nSubj,label,meth_Net,lambda_lasso)
-
+% This function performs parameter sensitivity test using all the subject data by LOOCV,and
+% all the combination of parameters.
+% Input:
+%       All_Feat: the constructed brain network using one combination of parameter;
+%       nSubj: number of subjects;
+%       label: the label for each subject; e.g., -1 for normal controls and 1 for patients;
+%       lambda_lasso: lambda in the lasso feature selection;
+%         
+% Written by Zhen Zhou, zzstefan@email.unc.edu
+% IDEA lab, https://www.med.unc.edu/bric/ideagroup
+% Department of Radiology and BRIC, University of North Carolina at Chapel Hill
+% College of Computer Science, Zhejiang University, China
 
 e = 1:nSubj;
-
 cpred = zeros(nSubj,1);
-
 score = zeros(nSubj,1);
 
 % LOOCV for testing

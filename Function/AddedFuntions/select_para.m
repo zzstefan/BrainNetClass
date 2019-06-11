@@ -1,4 +1,15 @@
 function [opt_paramt]=select_para(meth_Net,Acc_para,varargin)
+% This function is used to find the suggested parameter(s) according to the
+% Acc_para;
+
+% Input:
+%         meth_Net: brain network construction method;
+%         Acc_para: result obtained from the parameter sensitivitiy test;
+%         varargin: different parameters according to different brain network construction method;
+% Written by Zhen Zhou, zzstefan@email.unc.edu
+% IDEA lab, https://www.med.unc.edu/bric/ideagroup
+% Department of Radiology and BRIC, University of North Carolina at Chapel Hill
+% College of Computer Science, Zhejiang University, China        
 switch meth_Net
     case {'SR','WSR','GSR'}
         lambda_1=varargin{1};
@@ -24,10 +35,10 @@ switch meth_Net
         [max_acc,max_index]=max(Acc_para);
         which_C=ceil(max_index/length(W));
         which_W=mod(max_index,length(W));
-        opt_paramt(1,1)=C(which_C);
+        opt_paramt(1,2)=C(which_C);
         if which_W==0
-            opt_paramt(1,2)=W(length(C));
+            opt_paramt(1,1)=W(length(W));
         else
-            opt_paramt(1,2)=W(which_W);
+            opt_paramt(1,1)=W(which_W);
         end
 end

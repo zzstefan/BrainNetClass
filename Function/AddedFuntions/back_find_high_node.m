@@ -1,10 +1,31 @@
-
-
 function [result_features]=back_find_high_node(W,C,nROI,w,midw_lasso,IDX,opt_t)
 
-%%according to feature selction, find the remaining features after lasso, 
-%%high_index means the index after clustering, index means the index before clustering.
-% clear all
+% This function aims to find features used in the classification, suitable
+% for the dHOFC network construction method. And also
+% suitable for the LOOCV or the 10-fold cross validation. The finding
+% features can be applied on the visualization software to present the
+% important brain regios.
+% Input:
+%         W: window length
+%         C: number of cluster
+%         nROI: number of ROIs 
+%         w: weight of each selected features;
+%         midw_lasso: the feature selection indexes of lasso;
+%         IDX: the index in clustering;
+%         opt_t: the selected feat in each outer LOOCV;
+% Output:
+%        result_features: cell array, consisting of occurrence of the features, 
+%        node number, the cluster matrix and weight of the cluster;
+
+% Written by Zhen Zhou, zzstefan@email.unc.edu
+% IDEA lab, https://www.med.unc.edu/bric/ideagroup
+% Department of Radiology and BRIC, University of North Carolina at Chapel Hill
+% College of Computer Science, Zhejiang University, China
+% Written by Zhen Zhou, zzstefan@email.unc.edu
+% IDEA lab, https://www.med.unc.edu/bric/ideagroup
+% Department of Radiology and BRIC, University of North Carolina at Chapel Hill
+% College of Computer Science, Zhejiang University, China
+
 % 
 % load dHOFC_loocv_middle.mat;
 %load dHOFC_kfold_middle.mat;
@@ -16,7 +37,7 @@ for i =1:size(midw_lasso,1)
         which_C=ceil(opt_t(i,j)/length(W));
         which_W=mod(opt_t(i,j),length(W));
         if which_W ==0
-            which_W=length(C);
+            which_W=length(W);
         end
         index{i,j}=IDX{which_W,which_C};
         high_index{i,j}=find(midw_lasso{i,j}~=0);
@@ -104,7 +125,7 @@ result_features(:,3)=node_matrix';
 result_features(:,4)=num2cell(W);
 result_features=sortrows(result_features,1,'descend');%% sort according to the frequency of each cluster ,descend
 
-fprintf('End network construction\n');
+fprintf('End finding features\n');
 
 
 
