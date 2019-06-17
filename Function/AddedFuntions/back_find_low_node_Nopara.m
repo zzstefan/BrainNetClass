@@ -20,7 +20,7 @@ function [result_features]=back_find_low_node_Nopara(result_dir,nSubj,k_times,nR
 % Written by Zhen Zhou, zzstefan@email.unc.edu
 % IDEA lab, https://www.med.unc.edu/bric/ideagroup
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
-% College of Computer Science, Zhejiang University, China
+
 
 
 

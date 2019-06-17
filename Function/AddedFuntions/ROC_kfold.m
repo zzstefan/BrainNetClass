@@ -11,7 +11,7 @@ function []=ROC_kfold(plot_ROC,result_dir,k_fold)
 % Written by Zhen Zhou, zzstefan@email.unc.edu
 % IDEA lab, https://www.med.unc.edu/bric/ideagroup
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
-% College of Computer Science, Zhejiang University, China
+
 fold_times=k_fold;
 for i=1:fold_times
     tmp(:,i)=plot_ROC{i}(:,1);

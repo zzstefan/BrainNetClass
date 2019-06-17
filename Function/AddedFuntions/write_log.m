@@ -14,7 +14,7 @@ function write_log(result_dir,meth_Net,cross_val,AUC,SEN,SPE,F1,Acc,Youden,Balan
 % Written by Zhen Zhou, zzstefan@email.unc.edu
 % IDEA lab, https://www.med.unc.edu/bric/ideagroup
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
-% College of Computer Science, Zhejiang University, China
+
 
 fprintf('Saving the resluts.\n');
 fileName=char(strcat(result_dir,'/log.txt'));

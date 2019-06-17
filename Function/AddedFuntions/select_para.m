@@ -9,7 +9,7 @@ function [opt_paramt]=select_para(meth_Net,Acc_para,varargin)
 % Written by Zhen Zhou, zzstefan@email.unc.edu
 % IDEA lab, https://www.med.unc.edu/bric/ideagroup
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
-% College of Computer Science, Zhejiang University, China        
+      
 switch meth_Net
     case {'SR','WSR','GSR'}
         lambda_1=varargin{1};

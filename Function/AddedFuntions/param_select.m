@@ -24,7 +24,6 @@ function [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,varargout
 % Written by Zhen Zhou, zzstefan@email.unc.edu
 % IDEA lab, https://www.med.unc.edu/bric/ideagroup
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
-% College of Computer Science, Zhejiang University, China
 
 
 switch meth_Net

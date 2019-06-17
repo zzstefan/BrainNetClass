@@ -5,7 +5,6 @@ function varargout = BrainNetClass(varargin)
 %  Image Display, Enhancement, and Analysis (IDEA) Group
 %  Department of Radiology and Biomedical Research Imaging Center,
 %  University of North Carolina, Chapel Hill, NC 27599, USA
-%  College of Computer Science, Zhejiang University, Hangzhou, China.
 %  Written by Zhen Zhou, Han Zhang
 %  zzstefan@email.unc.edu, hanzhang@med.unc.edu
 
@@ -595,21 +594,21 @@ if strcmpi(handles.meth_Type,'Network Type I:  No Parameter Required')
     if strcmpi(handles.cross_val,'loocv')
         switch meth_FS
             case 't-test'
-                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest]=no_param_select(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
                 if AUC==0
                     uiwait(msgbox('AUC=0,you may need to add more samples or change a different feature extraction method.','Warning','modal'));
                     return;
                 end
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest);
             case 'LASSO'
-                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso]=no_param_select(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
                  if AUC==0
                     uiwait(msgbox('AUC=0,you may need to add more samples or change a different feature extraction method.','Warning','modal'));
                     return;
                 end
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_lasso);
             case 't-test + LASSO'
-                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=no_param_select(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
                  if AUC==0
                     uiwait(msgbox('AUC=0,you may need to add more samples or change a different feature extraction method.','Warning','modal'));
                     return;
@@ -619,21 +618,21 @@ if strcmpi(handles.meth_Type,'Network Type I:  No Parameter Required')
     elseif strcmpi(handles.cross_val,'10-fold')
         switch meth_FS
             case 't-test'
-                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest]=no_param_select_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
                  if AUC==0
                     uiwait(msgbox('AUC=0,you may need to add more samples or change a different feature extraction method.','Warning','modal'));
                     return;
                 end
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest);
             case 'LASSO'
-                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso]=no_param_select_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
                  if AUC==0
                     uiwait(msgbox('AUC=0,you may need to add more samples or change a different feature extraction method.','Warning','modal'));
                     return;
                 end
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_lasso);
             case 't-test + LASSO'
-                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
+                [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=no_param_select_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
                  if AUC==0
                     uiwait(msgbox('AUC=0,you may need to add more samples or change a different feature extraction method.','Warning','modal'));
                     return;
@@ -676,11 +675,11 @@ else
     elseif strcmpi(handles.cross_val,'10-fold')
         switch meth_Net
             case {'SR','WSR','GSR'}
-                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lasso_lambda);
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=param_select_kfold(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lasso_lambda);
             case {'SLR','SGR','WSGR','SSGSR'}
-                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lambda_2,handles.default.lasso_lambda);
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=param_select_kfold(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.lambda_1,handles.default.lambda_2,handles.default.lasso_lambda);
             case 'dHOFC'
-                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso,IDX]=kfold_param_select(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.window_length,handles.default.step,handles.default.clusters,handles.default.lasso_lambda);
+                [opt_paramt,opt_t,AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso,IDX]=param_select_kfold(handles.default.k_times,result_dir,meth_Net,BOLD,label,para_test_flag,handles.default.window_length,handles.default.step,handles.default.clusters,handles.default.lasso_lambda);
         end
     end
     
