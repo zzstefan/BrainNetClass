@@ -50,7 +50,7 @@ end
 Datetime=fix(clock);
 fprintf('Welcome: %s, %.4d-%.2d-%.2d %.2d:%.2d \n', UserName,Datetime(1),Datetime(2),Datetime(3),Datetime(4),Datetime(5));
 fprintf('BrainNet construction and classification toolbox (BrainNetClass) GUI. \nRelease = %s\n',Release);
-fprintf('Copyright(c) 2009; GNU GENERAL PUBLIC LICENSE\n');
+fprintf('Copyright(c) 2019; GNU GENERAL PUBLIC LICENSE\n');
 fprintf('Image Display, Enhancement, and Analysis (IDEA) Group, Department of Radiology and Biomedical Research Imaging Center, University of North Carolina, Chapel Hill, NC 27599, USA;\n');
 fprintf('College of Computer Science, Zhejiang University, Hangzhou, China.\n');
 fprintf('Mail to Author:  <a href="zzstefan@email.unc.edu">Zhen Zhou</a>');
@@ -596,24 +596,48 @@ if strcmpi(handles.meth_Type,'Network Type I:  No Parameter Required')
         switch meth_FS
             case 't-test'
                 [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
+                if AUC==0
+                    uiwait(msgbox('AUC=0,you may need to add more samples or change a different feature extraction method.','Warning','modal'));
+                    return;
+                end
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest);
             case 'LASSO'
                 [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
+                 if AUC==0
+                    uiwait(msgbox('AUC=0,you may need to add more samples or change a different feature extraction method.','Warning','modal'));
+                    return;
+                end
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_lasso);
             case 't-test + LASSO'
                 [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=demo_framwk(result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
+                 if AUC==0
+                    uiwait(msgbox('AUC=0,you may need to add more samples or change a different feature extraction method.','Warning','modal'));
+                    return;
+                end
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest,feature_index_lasso);
         end
     elseif strcmpi(handles.cross_val,'10-fold')
         switch meth_FS
             case 't-test'
                 [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
+                 if AUC==0
+                    uiwait(msgbox('AUC=0,you may need to add more samples or change a different feature extraction method.','Warning','modal'));
+                    return;
+                end
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest);
             case 'LASSO'
                 [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
+                 if AUC==0
+                    uiwait(msgbox('AUC=0,you may need to add more samples or change a different feature extraction method.','Warning','modal'));
+                    return;
+                end
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_lasso);
             case 't-test + LASSO'
                 [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,feature_index_ttest,feature_index_lasso]=demo_framwk_kfold(handles.default.k_times,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,handles.default.lasso_lambda);
+                 if AUC==0
+                    uiwait(msgbox('AUC=0,you may need to add more samples or change a different feature extraction method.','Warning','modal'));
+                    return;
+                end
                 [result_features]=back_find_low_node_Nopara(result_dir,nSubj,handles.default.k_times,nROI,w,handles.cross_val,meth_FEX,meth_FS,feature_index_ttest,feature_index_lasso);
         end
     end
@@ -679,7 +703,7 @@ save (char(strcat(result_dir,'/result_features.mat')),'result_features');
 set(handles.Result_details,'HorizontalAlignment','left','Fontname','Calibri','FontSize',10,...
     'string',sprintf('AUC: %0.4g\nACC: %3.2f%%\nSEN: %3.2f%%\nSPE: %3.2f%%\nF-score: %3.2f%%',AUC,Acc,SEN,SPE,F1));
 
-uiwait(msgbox('Classification Completed.','modal'));
+uiwait(msgbox('All Jobs Completed.','modal'));
 % --- Executes on button press in select_dir.
 
 function select_dir_Callback(hObject, eventdata, handles)

@@ -4,7 +4,7 @@ function [result_features]=back_find_high_node(W,C,nROI,w,midw_lasso,IDX,opt_t)
 % for the dHOFC network construction method. And also
 % suitable for the LOOCV or the 10-fold cross validation. The finding
 % features can be applied on the visualization software to present the
-% important brain regios.
+% important brain regions.
 % Input:
 %         W: window length
 %         C: number of cluster
@@ -20,11 +20,6 @@ function [result_features]=back_find_high_node(W,C,nROI,w,midw_lasso,IDX,opt_t)
 % Written by Zhen Zhou, zzstefan@email.unc.edu
 % IDEA lab, https://www.med.unc.edu/bric/ideagroup
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
-% College of Computer Science, Zhejiang University, China
-% Written by Zhen Zhou, zzstefan@email.unc.edu
-% IDEA lab, https://www.med.unc.edu/bric/ideagroup
-% Department of Radiology and BRIC, University of North Carolina at Chapel Hill
-% College of Computer Science, Zhejiang University, China
 
 % 
 % load dHOFC_loocv_middle.mat;
@@ -123,7 +118,8 @@ result_features(:,1)=new_out(:,2);
 result_features(:,2)=new_out(:,3);
 result_features(:,3)=node_matrix';
 result_features(:,4)=num2cell(W);
-result_features=sortrows(result_features,1,'descend');%% sort according to the frequency of each cluster ,descend
+%result_features=sortrows(result_features,1,'descend');%% sort according to the frequency of each cluster ,descend
+result_features=sortrows(result_features,-1);
 
 fprintf('End finding features\n');
 
