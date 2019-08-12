@@ -1,5 +1,5 @@
 function [opt_paramt]=select_para(meth_Net,Acc_para,varargin)
-% This function is used to find the suggested parameter(s) according to the
+% This function is used to find the optimized (and generate the suggested) parameter(s) according to the
 % Acc_para;
 
 % Input:

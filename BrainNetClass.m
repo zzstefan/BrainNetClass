@@ -28,7 +28,7 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before test is made visible.
+% --- Executes just before BrainNetClass is made visible.
 function BrainNetClass_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
@@ -36,9 +36,9 @@ function BrainNetClass_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to test (see VARARGIN)
 
-% Choose default command line output for test
+% Choose default command line output for BrainNetClass
 
-Release='V1.0';
+Release='V1.1';
 %handles.Release = Release; % Will be used in mat file version checking (e.g., in function SetLoadedData)
 
 if ispc
@@ -51,10 +51,9 @@ fprintf('Welcome: %s, %.4d-%.2d-%.2d %.2d:%.2d \n', UserName,Datetime(1),Datetim
 fprintf('BrainNet construction and classification toolbox (BrainNetClass) GUI. \nRelease = %s\n',Release);
 fprintf('Copyright(c) 2019; GNU GENERAL PUBLIC LICENSE\n');
 fprintf('Image Display, Enhancement, and Analysis (IDEA) Group, Department of Radiology and Biomedical Research Imaging Center, University of North Carolina, Chapel Hill, NC 27599, USA;\n');
-fprintf('College of Computer Science, Zhejiang University, Hangzhou, China.\n');
-fprintf('Mail to Author:  <a href="zzstefan@email.unc.edu">Zhen Zhou</a>');
+fprintf('Mail to Author:  <a href="zzstefan@email.unc.edu">Zhen Zhou</a> <a href="hanzhang@med.unc.edu">Han Zhang</a>');
 fprintf('\n-----------------------------------------------------------\n');
-fprintf('Citing Information:\nIf you think BrainNetClass is useful for your work, please citing the paper: \n');
+fprintf('Citing Information:\nIf you think BrainNetClass is useful for your work, citing it in your paper would be greatly appreciated!\nReference: Zhou, Z., Chen, X., Zhang, Y., Qiao, L., Yu, R., Pan, G., Zhang, H., Shen, D., 2019. Brain network construction and classification toolbox (BrainNetClass). arXiv:1906.09908.\n');
 
 
 BrainNetClassPath=fileparts(which('BrainNetClass.m'));
@@ -111,11 +110,11 @@ set(handles.sensitivity_test,'Enable','off');
 handles.default.lambda_1=[0.01:0.01:0.1];
 handles.default.lambda_2=[0.01:0.01:0.1];
 handles.default.clusters=[100:100:800];
-handles.default.window_length=[20:10:60];
+handles.default.window_length=[50:10:120];
 handles.default.k_times=10;
 
 % User can change the value of lasso_lambda and step 
-handles.default.lasso_lambda=0.1;
+handles.default.lasso_lambda=0.05;
 handles.default.step=1;
 
 handles.cross_val='loocv';
@@ -712,7 +711,7 @@ function select_dir_Callback(hObject, eventdata, handles)
 
 folderName = uigetdir();
 set(handles.data_dir,'string',folderName);
-
+% 
 % file_extension=any(size(dir([folderName '/*.mat']),1));
 % if file_extension==1
 %     dirOutput=dir(fullfile(folderName,'*.mat'));
@@ -724,17 +723,26 @@ set(handles.data_dir,'string',folderName);
 % [cs,index]=sort_nat(fileName);
 % for i=1:length(fileName)
 %     load([folder{i},'/',fileName{index(i)}]);
-%     BOLD{i}=Signals;
+%     BOLD{i}=ROISignals;
 % end
 % handles.file_extension=file_extension;
 
-% 
-dirOutput=dir(fullfile(folderName,'*.txt'));
+
+
+file_extension=any(size(dir([folderName '/*.csv']),1));
+if file_extension==1
+    dirOutput=dir(fullfile(folderName,'*.csv'));
+else
+    dirOutput=dir(fullfile(folderName,'*.txt'));
+end
 fileName={dirOutput.name}';
 %folder={dirOutput.folder}';
 for i=1:length(fileName)
     BOLD{i,1}=load([folderName,'/',fileName{i}]);
 end
+handles.file_extension=file_extension;
+
+
 
 handles.BOLD=BOLD;
 guidata(hObject,handles);
@@ -798,14 +806,15 @@ function select_label_Callback(hObject, eventdata, handles)
 % hObject    handle to select_label (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% % 
+
+
 % if handles.file_extension ==1
 %     [label_fileName,path]=uigetfile('.mat','please select the label file');
 % else 
 %     [label_fileName,path]=uigetfile('.txt','please select the label file');
 % end
 
-  [label_fileName,path]=uigetfile('.txt','please select the label file');
+[label_fileName,path]=uigetfile('.txt','please select the label file');
 
 label=importdata(fullfile(path,label_fileName));
 

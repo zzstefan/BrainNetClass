@@ -1,6 +1,6 @@
 function []=ROC_kfold(plot_ROC,result_dir,k_fold)
 % This is for drawing the ROC curve when performing the 10-fold cross validation 10 times.
-% Combine the 10 ROC curves into one.
+% Combine the 10 ROC curves into one by averaging.
 
 %Input:
 %   plot_ROC: middle results used to plot ROC curve, obtained from the

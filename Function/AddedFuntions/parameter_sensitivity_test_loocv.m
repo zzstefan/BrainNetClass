@@ -1,6 +1,6 @@
 function [Acc]=parameter_sensitivity_test_loocv(All_Feat,nSubj,label,meth_Net,lambda_lasso)
-% This function performs parameter sensitivity test using all the subject data by LOOCV,and
-% all the combination of parameters.
+% This function performs parameter sensitivity test using all the subject data with LOOCV, and
+% it is run across all the combination of parameters.
 % Input:
 %       All_Feat: the constructed brain network using one combination of parameter;
 %       nSubj: number of subjects;

@@ -61,7 +61,7 @@ nSubj=length(BOLD);
 % tHOFC: Topographical high-order FC
 % aHOFC: Associated high-order FC
 % dHOFC: Dynamic high-order FC
-fprintf('Begin network construction\n');
+fprintf('Network construction begin\n');
 switch meth_Net
     case 'PC'       % Pearson's correlation
         BrainNet=PC(BOLD);

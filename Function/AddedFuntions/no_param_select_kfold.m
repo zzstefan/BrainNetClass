@@ -1,6 +1,6 @@
 function [AUC,SEN,SPE,F1,Acc,w,Youden,BalanceAccuracy,varargout]=no_param_select_kfold(k_fold,result_dir,meth_Net,meth_FEX,meth_FS,BOLD,label,lambda_lasso)
 % This function is for classification problem that has no parameter(s) to
-% optimize.  Note that this function uses the 10-fold.
+% optimize.  Note that this function uses the 10-fold cross validation.
 
 % Input:
 %     result_dir: the directory you want to store all the results in;
@@ -36,7 +36,7 @@ nSubj=length(BOLD);
 % tHOFC: Topographical high-order FC
 % aHOFC: Associated high-order FC
 % dHOFC: Dynamic high-order FC
-fprintf('Begin network construction\n');
+fprintf('Network construction begin\n');
 switch meth_Net
     case 'PC'       % Pearson's correlation
         BrainNet=PC(BOLD);

@@ -1,9 +1,9 @@
 function [result_features]=back_find_low_node_Nopara(result_dir,nSubj,k_times,nROI,w,cross_val,meth_FEX,meth_FS,varargin)
 % This function aims to find features used in the classification, suitable
-% for the PC,aHOFC,tHOFC brain network construction method. And also
-% suitable for the LOOCV or the 10-fold cross validation. The finding
+% for the PC, aHOFC, tHOFC brain network construction method. And it is also
+% suitable for the LOOCV or the 10-fold cross validation. The found
 % features can be applied on the visualization software to present the
-% important brain regios.
+% important brain regions or links.
 % Input:
 %         result_dir: the directory you want to store all the result files;
 %         nSubj: number of subjects;
@@ -37,7 +37,7 @@ function [result_features]=back_find_low_node_Nopara(result_dir,nSubj,k_times,nR
 % cross_val='10-fold';
 %ttest_p=feature_index_ttest;
 % midw_lasso=feature_index_lasso;
-fprintf('Begin finding features\n');
+fprintf('Begin contributing feature identification\n');
 
 
 switch meth_FS
@@ -146,7 +146,7 @@ temp=first(:);
 
 [a1,b,c]=unique(cellfun(@char,temp,'un',0));
 lo=histc(c,1:max(c));
-loo=lo(:)>1;
+loo=lo(:)>0;
 out=[temp(b(loo)),num2cell(lo(loo))];
 out(1,:)=[];
 
@@ -225,7 +225,7 @@ if strcmpi(meth_FEX,'coef')
     print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/result_features_weigthAndOccurence.tiff')));
 end
 
-fprintf('End finding features\n');
+fprintf('End contributing feature identification\n');
 % node_matrix=eye(116,116);
 % for i=1:length(NEW)
 %     for j=1:length(NEW{i,3})

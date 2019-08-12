@@ -1,8 +1,8 @@
 % This demo is for classification problem that has parameter(s) to
 % optimize. If more parameters to be optimized, more inner LOOCV runs
 % (additional for-loop) should be used. All networks corresponding to
-% different combinations of parameters should be prepared beforehand. Note
-% that this function uses the LOOCV.
+% different combinations of parameters should be prepared beforehand. 
+% Note that this function uses the LOOCV.
 
 % 
 % Input:
@@ -24,7 +24,6 @@
 % IDEA lab, https://www.med.unc.edu/bric/ideagroup
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
 
-%% without sparse matrix
 function [opt_paramt,AUC,SEN,SPE,F1,Acc,opt_t,ttest_p,midw_lasso,w,plot_ROC]=param_select_demo(result_dir,meth_Net,BOLD,label,para_test_flag,varargin)
 switch meth_Net
     case {'SR','WSR','GSR'}
@@ -141,7 +140,7 @@ switch meth_Net
         num_W=length(W);
         parfor i=1:num_W % number of clusters
             for j=1:num_C
-                BrainNet{i,j}=dHOFC(BOLD,W(i),s,C(j));
+                [BrainNet{i,j},IDX{i,j}]=dHOFC(BOLD,W(i),s,C(j));
             end
         end
         BrainNet=reshape(BrainNet,1,num_W*num_C);
@@ -280,7 +279,7 @@ for i=1:nSubj
         trFe=trFe(:,midw~=0);
         teFe=teFe(:,midw~=0);
         midw_lasso{i}=midw;
-              ttest_p{i}=midw;
+        ttest_p{i}=midw;
 
     end
     
@@ -300,7 +299,7 @@ for i=1:nSubj
 end
 
 Acc=100*sum(cpred==label)/nSubj;
-[AUC,SEN,SPE,F1,plot_ROC]=perfeval(label,cpred,score,result_dir);
+[AUC,SEN,SPE,F1,Youden,BalanceAccuracy,plot_ROC]=perfeval(label,cpred,score,result_dir);
 
 
 
@@ -414,5 +413,18 @@ if para_test_flag==1
       end
       fprintf('End parameter sensitivity test\n');
 end
-    
 
+k_times=10;
+switch meth_Net
+        case {'SR','WSR','GSR'}
+            [result_features]=back_find_low_node_para(result_dir,nSubj,k_times,nROI,w,'loocv',ttest_p,midw_lasso);
+            write_log(result_dir,meth_Net,'loocv',AUC,SEN,SPE,F1,Acc,Youden,BalanceAccuracy,lambda_1,lambda_lasso,opt_paramt,k_times,opt_t);
+        case {'SGR','WSGR','SSGSR','SLR'}
+            [result_features]=back_find_low_node_para(result_dir,nSubj,k_times,nROI,w,'loocv',ttest_p,midw_lasso);
+            write_log(result_dir,meth_Net,'loocv',AUC,SEN,SPE,F1,Acc,Youden,BalanceAccuracy,lambda_1,lambda_2,lambda_lasso,opt_paramt,k_times,opt_t);
+        case 'dHOFC'
+            [result_features]=back_find_high_node(W,C,nROI,w,midw_lasso,IDX,opt_t);
+            write_log(result_dir,meth_Net,'loocv',AUC,SEN,SPE,F1,Acc,Youden,BalanceAccuracy,W,s,C,lambda_lasso,opt_paramt,k_times,opt_t);
+end
+                
+save (char(strcat(result_dir,'/result_features.mat')),'result_features');    

@@ -73,8 +73,8 @@ for i=1:nSubj
     r=zeros(RegionNum,RegionNum-1,'single');
     r(:,:)=abs(Corr_Record(i,:,:));
     %% exp
-    r_std=std(r(:));
-    %r_std=0.2;
+    %r_std=std(r(:));
+    r_std=0.2;
     r=exp((r.^2)/r_std);
     %% weighted sparse representation
     X=zeros(RegionNum);

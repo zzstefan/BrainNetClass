@@ -1,8 +1,7 @@
-% This funion is for generating brain networks that has no 
-% parameter to optimize and then doing classification. 
-
-% Note that this function uses the LOOCV. If user wants to use 
-% 10-fold cross validation, use GUI.
+% This demo is for classification problem that has no parameter(s) to
+% optimize. All networks corresponding to different combinations of 
+% parameters should be prepared beforehand. 
+% Note that this function uses the LOOCV.
 
 % 
 % Input:
@@ -10,7 +9,7 @@
 %     meth_Net: the brain network construction method;
 %     meth_FEX: feature extraction method
 %     meth_FS: feature selection method
-%     BOLD: time courses extracted;
+%     BOLD: time courses extracted using a template;
 %     label: the label for each subject; e.g., -1 for normal controls and 1 for patients;
 %     
 % Output:
@@ -120,22 +119,20 @@ for i=1:nSubj
     
     % Feature selection %
     % t-test
-    if any(strcmp(meth_FS,'t-test'))
+    if any(strcmp(meth_FS,'ttest'))
         pval=0.05;  % generally use pval<0.05 as a threshold for feature selection
         [h,p]=ttest2(trFe(trlabel==-1,:),trFe(trlabel==1,:));
         trFe=trFe(:,p<pval);
         teFe=teFe(:,p<pval);
-        ttest_p{i}=p;
     end
     % Lasso
-    if any(strcmp(meth_FS,'LASSO'))
+    if any(strcmp(meth_FS,'lasso'))
         midw=lasso(trFe,trlabel,'Lambda',lambda_lasso);  % parameter lambda for sparsity
         trFe=trFe(:,midw~=0);
         teFe=teFe(:,midw~=0);
-        midw_lasso{i}=midw;
     end
     
-    if any(strcmp(meth_FS,'t-test + LASSO'))
+    if any(strcmp(meth_FS,'ttest + lasso'))
         pval=0.05;  % generally use pval<0.05 as a threshold for feature selection
         [h,p]=ttest2(trFe(trlabel==-1,:),trFe(trlabel==1,:));
         trFe=trFe(:,p<pval);
@@ -144,8 +141,6 @@ for i=1:nSubj
         midw=lasso(trFe,trlabel,'Lambda',lambda_lasso);  % parameter lambda for sparsity
         trFe=trFe(:,midw~=0);
         teFe=teFe(:,midw~=0);
-        ttest_p{i}=p;
-        midw_lasso{i}=midw;       
     end
     
     
@@ -164,9 +159,8 @@ for i=1:nSubj
     [cpred(i,1),acc,score(i,1)]=svmpredict(label(i),teFe,classmodel,'-q');
 end
 Acc=100*sum(cpred==label)/nSubj;
-[AUC,SEN,SPE,F1,Youden,BalanceAccuracy,plot_ROC]=perfeval(label,cpred,score,result_dir);
+[AUC,SEN,SPE,F1,plot_ROC]=perfeval(label,cpred,score,result_dir);
 fprintf('End calculation process\n');
-
 
 k_times=10; %%it is not used.
 
@@ -179,4 +173,3 @@ switch meth_FS
         [result_features]=back_find_low_node_Nopara(result_dir,nSubj,k_times,nROI,w,'loocv',meth_FEX,meth_FS,ttest_p,midw_lasso);
 end
 write_log(result_dir,meth_Net,'loocv',AUC,SEN,SPE,F1,Acc,Youden,BalanceAccuracy,meth_FEX,meth_FS,k_times,lambda_lasso);
-save (char(strcat(result_dir,'/result_features.mat')),'result_features');    

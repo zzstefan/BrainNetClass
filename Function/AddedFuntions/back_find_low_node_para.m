@@ -1,10 +1,10 @@
 function [result_features]=back_find_low_node_para(result_dir,nSubj,k_times,nROI,w,cross_val,ttest_p,midw_lasso)
 
 % This function aims to find features used in the classification, suitable
-% for the SR,SLR,SGR,GSR,WSR,WSGR,SSGSR network construction method. And also
-% suitable for the LOOCV or the 10-fold cross validation. The finding
+% for the SR,SLR,SGR,GSR,WSR,WSGR,SSGSR network construction method. And it is also
+% suitable for the LOOCV or the 10-fold cross validation. The found
 % features can be applied on the visualization software to present the
-% important brain regios.
+% important brain regions or links.
 % Input:
 %         result_dir: the directory you want to store all the result files;
 %         nSubj: number of subjects;
@@ -31,7 +31,7 @@ function [result_features]=back_find_low_node_para(result_dir,nSubj,k_times,nROI
 % cross_val='loocv';
 % ttest_p=feature_index_ttest;
 % midw_lasso=feature_index_lasso;
-fprintf('Begin finding features\n');
+fprintf('Begin contributing feature identification\n');
 if strcmpi(cross_val,'10-fold')
     for i=1:size(ttest_p,1)
         for j=1:size(ttest_p,2)
@@ -59,7 +59,7 @@ temp=first(:);
 
 [a1,b,c]=unique(cellfun(@char,temp,'un',0));
 lo=histc(c,1:max(c));
-loo=lo(:)>1;
+loo=lo(:)>0;
 out=[temp(b(loo)),num2cell(lo(loo))];
 out(1,:)=[];
 
@@ -127,4 +127,4 @@ title('Normalized occurence');
 print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/result_features_weigthAndOccurence.tiff')));
 
 
-fprintf('End finding features\n');
+fprintf('End contributing feature identification\n');

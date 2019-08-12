@@ -1,10 +1,10 @@
 function [result_features]=back_find_high_node(W,C,nROI,w,midw_lasso,IDX,opt_t)
 
 % This function aims to find features used in the classification, suitable
-% for the dHOFC network construction method. And also
-% suitable for the LOOCV or the 10-fold cross validation. The finding
+% for the dHOFC network construction method. And it is also
+% suitable for the LOOCV or the 10-fold cross validation. The found
 % features can be applied on the visualization software to present the
-% important brain regions.
+% important high-order nodes (a set of links in each high-order node).
 % Input:
 %         W: window length
 %         C: number of cluster
@@ -24,7 +24,7 @@ function [result_features]=back_find_high_node(W,C,nROI,w,midw_lasso,IDX,opt_t)
 % 
 % load dHOFC_loocv_middle.mat;
 %load dHOFC_kfold_middle.mat;
-fprintf('Begin finding features\n');
+fprintf('Begin contributing feature identification\n');
 
 
 for i =1:size(midw_lasso,1)
@@ -63,7 +63,7 @@ temp=tmp(:);
 
 [a1,b,c]=unique(cellfun(@char,temp,'un',0));
 lo=histc(c,1:max(c));
-loo=lo(:)>1;
+loo=lo(:)>0;
 out=[temp(b(loo)),num2cell(lo(loo))];
 out(1,:)=[];
 new_out=out;
@@ -121,7 +121,7 @@ result_features(:,4)=num2cell(W);
 %result_features=sortrows(result_features,1,'descend');%% sort according to the frequency of each cluster ,descend
 result_features=sortrows(result_features,-1);
 
-fprintf('End finding features\n');
+fprintf('End contributing feature identification\n');
 
 
 

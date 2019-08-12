@@ -1,5 +1,6 @@
 function []=save_model(BrainNet,meth_Net,label,result_dir,varargin)
-
+% This is to save the constructed classification model and include everything that will be used 
+% for classifying new data in the future.
 switch meth_Net
     case {'SR','SLR','SGR','GSR','WSR','WSGR','SSGSR'}
         meth_FEX='coef';

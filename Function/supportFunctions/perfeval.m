@@ -1,4 +1,4 @@
-function [auc,SEN,SPE,F1,Youden,BalanceAccuracy,plot_ROC]=perfeval(Label,pred_Label,prob_Estimates,result_dir)
+function [AUC,SEN,SPE,F1,Youden,BalanceAccuracy,plot_ROC]=perfeval(Label,pred_Label,prob_Estimates,result_dir)
 % Performance evaluation
 % 1: Patient (e.g., MCI), -1: Normal control (NC)
 % 
@@ -21,7 +21,7 @@ BalanceAccuracy = 0.5*(Sensitivity+Specificity);
 roc_y = Label(ind);
 stack_x = cumsum(roc_y == -1)/sum(roc_y == -1);
 stack_y = cumsum(roc_y == 1)/sum(roc_y == 1);
-auc = sum((stack_x(2:length(roc_y),1)-stack_x(1:length(roc_y)-1,1)).*stack_y(2:length(roc_y),1));
+AUC = sum((stack_x(2:length(roc_y),1)-stack_x(1:length(roc_y)-1,1)).*stack_y(2:length(roc_y),1));
 plot_ROC=[stack_x,stack_y];
 %figure
 figure('visible','off');
@@ -31,18 +31,18 @@ set(gca,'XTick',[0:0.1:1]);
 axis square;
 xlabel('False Positive Rate');
 ylabel('True Positive Rate');
-title(['ROC curve (AUC = ' num2str(auc) ')']);
+title(['ROC curve (AUC = ' num2str(AUC) ')']);
 
 print(gcf,'-r1000','-dtiff',char(strcat(result_dir,'/ROC.tiff')));
 
 
 
-fprintf('Testing set AUC: %g\n',auc);
-fprintf(1,'Testing set Sens: %3.2f%%\n',Sensitivity*100);
-fprintf(1,'Testing set Spec: %3.2f%%\n',Specificity*100);
-fprintf(1,'Testing set Youden: %3.2f%%\n',Youden*100);
-fprintf(1,'Testing set F-score: %3.2f%%\n',Fscore*100);
-fprintf(1,'Testing set BAC: %3.2f%%\n',BalanceAccuracy*100);
+fprintf('Testing result AUC: %g\n',AUC);
+fprintf(1,'Testing result Sens: %3.2f%%\n',Sensitivity);
+fprintf(1,'Testing result Spec: %3.2f%%\n',Specificity);
+fprintf(1,'Testing result Youden: %3.2f%%\n',Youden);
+fprintf(1,'Testing result F-score: %3.2f%%\n',Fscore);
+fprintf(1,'Testing result BAC: %3.2f%%\n',BalanceAccuracy);
 
 SEN=Sensitivity*100;
 SPE=Specificity*100;

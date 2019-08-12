@@ -1,7 +1,7 @@
 function write_log(result_dir,meth_Net,cross_val,AUC,SEN,SPE,F1,Acc,Youden,BalanceAccuracy,varargin)
 
-% This function records all the calculation details onto a logfile, including the method used to construct the brain network, the parameter range,
-% the function of each parameter, using LOOCV/10-fold to conduct the analysis, the suggested parameters, the occurrence frequency of each parameter
+% This function records all the calculation details in a log file, including the method used to construct the brain network, the parameter range,
+% the meaning of each parameter, the CV method (using LOOCV/10-fold CV) to conduct the analysis, the suggested parameters, the occurrence frequency of each parameter
 % or parameter combination.
 % 
 % Input:
@@ -16,7 +16,7 @@ function write_log(result_dir,meth_Net,cross_val,AUC,SEN,SPE,F1,Acc,Youden,Balan
 % Department of Radiology and BRIC, University of North Carolina at Chapel Hill
 
 
-fprintf('Saving the resluts.\n');
+fprintf('Save resluts.\n');
 fileName=char(strcat(result_dir,'/log.txt'));
 fp=fopen(fileName,'w');
 % fprintf(fp,'%%PC: Pearson''s correlation \r\n%%SR: Sparse representation \r\n%%WSR: Weighted SR \r\n');

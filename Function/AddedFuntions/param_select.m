@@ -61,7 +61,7 @@ nSubj=length(BOLD);
 % mkdir ./Generated_BrainNet_test
 % dir=['./Generated_BrainNet_test/'];
 
-fprintf('Begin network construction\n');
+fprintf('Network construction begin\n');
 switch meth_Net
     case 'SR'       % Sparse representation
         lambda=lambda_1; % parameter for sparsity
@@ -200,7 +200,7 @@ score = zeros(nSubj,1);
 for i=1:nSubj
     ind = find(indx == i);
     if ~isempty(ind)
-        fprintf(1,'Begin process %d%%...\n',ind*10);
+        fprintf(1,'Processing %d%%...\n',ind*10);
     end
     
     Tst_ind = i;
