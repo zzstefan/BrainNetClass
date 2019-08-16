@@ -21,7 +21,7 @@ Update information (8/17/2019)
 4.	An “input_BrainNet.m” script is added in the folder “/BatchExamples” so that users with their own built brain networks by using other methods or toolboxes can use them to perform further classification analysis with our BrainNetClass. This will skip the network construction part. Note: this can be done with command line mode only.
 
 5.	A new model saving function is added to the BrainNetClass through a script “save_model.m” for saving a well trained classification model with optimized parameter(s) and all other configurations used in the model for future use. For example, users are able to save their classification model once it is trained with adequate samples and reached satisfactory performance. Once they have a new sample, they could directly apply the saved model to classify the new sample.
-
+---------------------------------------------------------------------------------------------------------------------------------------
 
 References \
 [1] Chen, X., Zhang, H., Gao, Y., Wee, C.Y., Li, G., Shen, D., Alzheimer's Disease Neuroimaging, I., 2016. High-order resting-state functional connectivity network for MCI classification. Hum Brain Mapp 37, 3282-3296. \
