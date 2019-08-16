@@ -11,6 +11,17 @@ For details, please see the manual. Exemplary toy data are provided for a quick 
 
 BrainNetClass-v1.0 uses libsvm-3.23 and SLEP-4.1 toolboxes. We would like to thank Xiaobo Chen, Yu Zhang, Lishan Qiao, Renping Yu for their contributions. It was supported by the NIH grants (EB022880, AG041721, AG049371, and AG042599). 
 
+Update information (8/17/2019)
+1.	The fMRI time series input can take both .csv and .txt formats, allowing users to conveniently use the output from other toolboxes (e.g., Brant, https://sphinx-doc-brant.readthedocs.io/en/latest/).
+
+2.	Additional batch examples are added in a new folder named “/BatchExamples”. These batch examples allow users with certain programming skill to conveniently change the parameters and run BrainNetClass with a batch mode (command-line mode). The batch script “run_EC_EO_demo.m” is for users to run the entire analysis and it calls “no_para_select_demo.m” or “param_select_demo.m”. The EC and EO data can be used as the exemplary data to run this batch example.
+
+3.	A “save_BrainNet.m” script is added in the folder “/BatchExamples”. Users may use this it to generate any brain networks using the advanced network construction methods included in the BrainNetClass and save them for future usage, e.g., to perform group comparison analysis. By running this script, it will skip the classification part. Note: this can be done with command line mode only.
+
+4.	An “input_BrainNet.m” script is added in the folder “/BatchExamples” so that users with their own built brain networks by using other methods or toolboxes can use them to perform further classification analysis with our BrainNetClass. This will skip the network construction part. Note: this can be done with command line mode only.
+
+5.	A new model saving function is added to the BrainNetClass through a script “save_model.m” for saving a well trained classification model with optimized parameter(s) and all other configurations used in the model for future use. For example, users are able to save their classification model once it is trained with adequate samples and reached satisfactory performance. Once they have a new sample, they could directly apply the saved model to classify the new sample.
+
 
 References \
 [1] Chen, X., Zhang, H., Gao, Y., Wee, C.Y., Li, G., Shen, D., Alzheimer's Disease Neuroimaging, I., 2016. High-order resting-state functional connectivity network for MCI classification. Hum Brain Mapp 37, 3282-3296. \
