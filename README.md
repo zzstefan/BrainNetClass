@@ -11,7 +11,7 @@ For details, please see the manual. Exemplary toy data are provided for a quick 
 
 BrainNetClass-v1.0 uses libsvm-3.23 and SLEP-4.1 toolboxes. We would like to thank Xiaobo Chen, Yu Zhang, Lishan Qiao, Renping Yu for their contributions. It was supported by the NIH grants (EB022880, AG041721, AG049371, and AG042599). 
 
-Update information (8/17/2019)
+Update information (v1.1, 8/17/2019)
 1.	The fMRI time series input can take both .csv and .txt formats, allowing users to conveniently use the output from other toolboxes (e.g., Brant, https://sphinx-doc-brant.readthedocs.io/en/latest/).
 
 2.	Additional batch examples are added in a new folder named “/BatchExamples”. These batch examples allow users with certain programming skill to conveniently change the parameters and run BrainNetClass with a batch mode (command-line mode). The batch script “run_EC_EO_demo.m” is for users to run the entire analysis and it calls “no_para_select_demo.m” or “param_select_demo.m”. The EC and EO data can be used as the exemplary data to run this batch example.
