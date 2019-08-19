@@ -59,7 +59,7 @@ temp=first(:);
 
 [a1,b,c]=unique(cellfun(@char,temp,'un',0));
 lo=histc(c,1:max(c));
-loo=lo(:)>0;
+loo=lo(:)>1;
 out=[temp(b(loo)),num2cell(lo(loo))];
 out(1,:)=[];
 
