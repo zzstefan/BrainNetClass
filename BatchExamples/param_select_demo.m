@@ -144,7 +144,6 @@ switch meth_Net
             end
         end
         BrainNet=reshape(BrainNet,1,num_W*num_C);
-        nROI=C;
         %save (char(strcat(dir,meth_Net,'_net.mat')),'BrainNet','-v7.3');
 end
 fprintf('Network construction finished\n');
@@ -172,7 +171,7 @@ else
     %idxtu=triu(ones(nROI,nROI),1);
     for i=1:length(BrainNet)
         temp=ceil(i/length(W));
-        Feat=zeros(nSubj,nROI(temp)); 
+        Feat=zeros(nSubj,C(temp)); 
         flag=2;
         for j=1:nSubj
             Feat(j,:)=wlcc(BrainNet{i}(:,:,j),flag);
