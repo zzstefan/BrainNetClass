@@ -30,7 +30,7 @@ fileName={dirOutput.name}';
 for i=1:length(fileName)
     BOLD{i,1}=load([input_folder,'/',fileName{i}]);
 end
-label=importdata(label_input);
+%label=importdata(label_input);
 
 [~,nROI]=size(BOLD{1});
 nSubj=length(BOLD);
