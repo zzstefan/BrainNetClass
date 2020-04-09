@@ -154,7 +154,7 @@ for i=1:nSubj
     Mtr=mean(trFe);
     Str=std(trFe);
     trFe=trFe-repmat(Mtr,size(trFe,1),1);
-    tFrFe=trFe./repmat(Str,size(trFe,1),1);
+    trFe=trFe./repmat(Str,size(trFe,1),1);
     teFe=teFe-Mtr;
     teFe=teFe./Str;
     % train SVM model
