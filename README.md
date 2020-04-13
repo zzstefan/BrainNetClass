@@ -32,4 +32,4 @@ References \
 [6] Chen, X., Zhang, H., Shen, D., 2017. Hierarchical High-Order Functional Connectivity Networks and Selective Feature Fusion for MCI Classification. Neuroinformatics, 15(3):271-284. \
 [7] Yu, R., Zhang, H., An, L., Chen, X., Wei, Z., Shen, D., 2017. Connectivity strength-weighted sparse group representation-based brain network construction for MCI classification. Human Brain Mapping, 38(5): 2370-2383. \
 [8] Zhang, H., Chen, X., Shi, F., Li, G., Kim, M., Giannakopoulos, P., Haller, S., Shen, D., 2016. Topographic Information based High-Order Functional Connectivity and its Application in Abnormality Detection for Mild Cognitive Impairment, Journal of Alzheimer's Disease, 54(3): 1095-1112. \
-[9] To be published.
+[9] Zhou, Z., Chen, X., Zhang, Y., Hu, D., Qiao, L., Yu, R., ... & Shen, D. (2020). A toolbox for brain network construction and classification (BrainNetClass). Human Brain Mapping.
