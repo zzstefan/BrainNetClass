@@ -24,5 +24,5 @@ end
 
 tmp=connection_index-sum(new_index(1:i-1));
 first=i;
-M=i+1:116;
+M=i+1:nROI;
 second=M(tmp);
